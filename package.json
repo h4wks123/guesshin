@@ -20,20 +20,30 @@
 		"@cloudflare/vitest-pool-workers": "0.21.3",
 		"@cloudflare/workers-types": "^5.20260921.1",
 		"@types/node": "24.10.1",
+		"@types/react": "^19.2.2",
+		"@types/react-dom": "^19.2.2",
+		"@vitejs/plugin-react": "^5.0.4",
 		"@vitest/runner": "4.1.10",
 		"@vitest/snapshot": "4.1.10",
 		"typescript": "5.9.3",
+		"vite": "^7.1.7",
 		"vitest": "4.1.10",
 		"wrangler": "4.136.1"
+	},
+	"dependencies": {
+		"react": "^19.2.0",
+		"react-dom": "^19.2.0"
 	},
 	"private": true,
 	"scripts": {
 		"cf-typegen": "wrangler types",
 		"check": "tsc --noEmit && wrangler deploy --dry-run",
 		"deploy": "wrangler deploy",
-		"dev": "wrangler dev",
+		"dev": "vite",
+		"dev:worker": "wrangler dev",
 		"e2e:dev": "wrangler dev --config wrangler.e2e.jsonc",
 		"start": "wrangler dev",
-		"test": "vitest"
+		"test": "vitest",
+		"build": "vite build"
 	}
 }

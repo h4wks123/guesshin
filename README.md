@@ -13,14 +13,14 @@ This template demonstrates how to build an AI-powered chat interface using Cloud
 - Real-time streaming of AI responses using Server-Sent Events (SSE)
 - Easy customization of models and system prompts
 - Support for AI Gateway integration
-- Clean, responsive UI that works on mobile and desktop
+- Clean, responsive React UI that works on mobile and desktop
 
 ## Features
 
 - 💬 Simple and responsive chat interface
 - ⚡ Server-Sent Events (SSE) for streaming responses
 - 🧠 Powered by Cloudflare Workers AI LLMs
-- 🛠️ Built with TypeScript and Cloudflare Workers
+- 🛠️ Built with React, Vite, TypeScript, and Cloudflare Workers
 - 📱 Mobile-friendly design
 - 🔄 Maintains chat history on the client
 - 🔎 Built-in Observability logging
@@ -56,13 +56,22 @@ This template demonstrates how to build an AI-powered chat interface using Cloud
 
 ### Development
 
-Start a local development server:
+Start the Vite frontend:
 
 ```bash
 npm run dev
 ```
 
-This will start a local server at http://localhost:8787.
+This will start a local server at http://localhost:5173. The `/api` requests are
+proxied to a local Worker at http://localhost:8787, so start the Worker in a
+second terminal when you want to use the chat API:
+
+```bash
+npm run dev:worker
+```
+
+For a single server that serves the built frontend and Worker together, run
+`npm run build` followed by `npm run start`.
 
 Note: Using Workers AI accesses your Cloudflare account even during local development, which will incur usage charges.
 
@@ -86,10 +95,12 @@ npm wrangler tail
 
 ```
 /
-├── public/             # Static assets
-│   ├── index.html      # Chat UI HTML
-│   └── chat.js         # Chat UI frontend script
+├── index.html          # Vite HTML entry point
 ├── src/
+│   ├── client/
+│   │   ├── App.tsx     # React chat UI and streaming client
+│   │   ├── main.tsx    # React entry point
+│   │   └── styles.css  # Chat UI styles
 │   ├── index.ts        # Main Worker entry point
 │   └── types.ts        # TypeScript type definitions
 ├── test/               # Test files
@@ -110,7 +121,7 @@ The backend is built with Cloudflare Workers and uses the Workers AI platform to
 
 ### Frontend
 
-The frontend is a simple HTML/CSS/JavaScript application that:
+The frontend is a React/Vite application that:
 
 1. Presents a chat interface
 2. Sends user messages to the API
@@ -144,7 +155,7 @@ The default system prompt can be changed by updating the `SYSTEM_PROMPT` constan
 
 ### Styling
 
-The UI styling is contained in the `<style>` section of `public/index.html`. You can modify the CSS variables at the top to quickly change the color scheme.
+The UI styling is contained in `src/client/styles.css`. You can modify the CSS variables at the top to quickly change the color scheme.
 
 ## Resources
 
