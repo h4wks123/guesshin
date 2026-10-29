@@ -71,9 +71,36 @@ npm run dev:worker
 ```
 
 For a single server that serves the built frontend and Worker together, run
-`npm run build` followed by `npm run start`.
+`npm run start`.
 
 Note: Using Workers AI accesses your Cloudflare account even during local development, which will incur usage charges.
+
+### Docker
+
+Build and run the Worker locally in a container:
+
+```bash
+docker compose up --build
+```
+
+Open http://localhost:8787 after the container starts. The image runs Wrangler
+in local mode as a non-root user and does not include secrets. To use the remote
+Workers AI binding from Docker, provide `CLOUDFLARE_API_TOKEN` at runtime and
+override the command with `npx wrangler dev --remote --ip 0.0.0.0`.
+
+To run the same containerized validation used by GitHub Actions:
+
+```bash
+docker build --target ci .
+```
+
+### GitHub and Cloudflare CI/CD
+
+GitHub Actions validates pull requests and pushes to `main` by building the
+Docker `ci` target. The existing Cloudflare Workers Builds pipeline remains the
+deployment system and runs `npm run deploy`, which builds the Vite frontend
+before calling Wrangler. This avoids deploying the same commit twice from two
+different systems.
 
 ### Deployment
 
@@ -96,6 +123,10 @@ npm wrangler tail
 ```
 /
 ├── index.html          # Vite HTML entry point
+├── Dockerfile           # Multi-stage local/CI container build
+├── compose.yaml         # Local Worker container
+├── .github/workflows/
+│   └── ci.yml           # Docker-based GitHub validation
 ├── src/
 │   ├── client/
 │   │   ├── App.tsx     # React chat UI and streaming client
@@ -103,7 +134,6 @@ npm wrangler tail
 │   │   └── styles.css  # Chat UI styles
 │   ├── index.ts        # Main Worker entry point
 │   └── types.ts        # TypeScript type definitions
-├── test/               # Test files
 ├── wrangler.jsonc      # Cloudflare Worker configuration
 ├── tsconfig.json       # TypeScript configuration
 └── README.md           # This documentation

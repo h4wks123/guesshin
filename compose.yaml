@@ -1,0 +1,8 @@
+services:
+  worker:
+    build:
+      context: .
+      target: runtime
+    ports:
+      - "8787:8787"
+    command: ["npx", "wrangler", "dev", "--local", "--ip", "0.0.0.0"]
