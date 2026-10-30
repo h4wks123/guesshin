@@ -56,15 +56,25 @@ This template demonstrates how to build an AI-powered chat interface using Cloud
 
 ### Development
 
+Create your local environment file:
+
+```bash
+cp .env.example .env
+```
+
+`PORT` controls the Vite frontend port. `WORKER_PORT` controls the Vite proxy
+target; both values are required and must be aligned with the port used by
+Wrangler.
+
 Start the Vite frontend:
 
 ```bash
 npm run dev
 ```
 
-This will start a local server at http://localhost:5173. The `/api` requests are
-proxied to a local Worker at http://localhost:8787, so start the Worker in a
-second terminal when you want to use the chat API:
+The frontend uses the `PORT` value from `.env`. The `/api` requests are
+proxied to the local Worker at the `WORKER_PORT` value, so start the Worker in
+a second terminal when you want to use the chat API:
 
 ```bash
 npm run dev:worker
@@ -75,69 +85,17 @@ For a single server that serves the built frontend and Worker together, run
 
 Note: Using Workers AI accesses your Cloudflare account even during local development, which will incur usage charges.
 
-### Docker
-
-The single Dockerfile provides separate targets for local development,
-validation, and the CI deployment path. Docker Compose is not required.
-
-Build and run the development image:
-
-```bash
-docker build --target dev -t guesshin:dev .
-docker run --rm --name guesshin-dev -p 8787:8787 guesshin:dev
-```
-
-Open http://localhost:8787 after the container starts. The image runs Wrangler
-in local mode as a non-root user. To use the remote Workers AI binding, provide
-`CLOUDFLARE_API_TOKEN` at runtime and override the command:
-
-```bash
-docker run --rm --name guesshin-dev -p 8787:8787 \
-  -e CLOUDFLARE_API_TOKEN="$CLOUDFLARE_API_TOKEN" \
-  guesshin:dev npx wrangler dev --remote --ip 0.0.0.0
-```
-
-Build the test target locally:
-
-```bash
-docker build --target test -t guesshin:test .
-```
-
-The test target runs `npm run test:ci` and `npm run check` during the image
-build. `test:ci` is the non-interactive Vitest command and currently allows the
-repository to pass while no test files exist.
-
-Build the CI target manually for validation only:
-
-```bash
-docker build --target ci -t guesshin-ci .
-```
-
-The `ci` target inherits the test target. It is the image built by GitHub
-Actions. The `deploy` target inherits `ci`, so it cannot be built unless the
-tests and checks pass:
-
-```bash
-docker build --target deploy -t guesshin-deploy .
-docker run --rm \
-  -e CLOUDFLARE_API_TOKEN \
-  -e CLOUDFLARE_ACCOUNT_ID \
-  guesshin-deploy
-```
-
-The GitHub workflow uses this same `deploy` target and tags it with the commit
-SHA before starting it.
-
-The default image target is `runtime`, which currently behaves like the `dev`
-target. You can build it explicitly with `docker build -t guesshin:local .`.
-
 ### GitHub and Cloudflare CI/CD
 
-GitHub Actions validates pull requests and pushes to `main` by building the
-Docker `deploy` target. Because `deploy` inherits the `ci` target, a push to
-`main` deploys only after validation succeeds.
-The deployment runs `wrangler deploy` inside the same validated Docker image,
-so CI and deployment use the same Node.js version and installed dependencies.
+GitHub Actions runs the native Node.js/Wrangler pipeline for pull requests and
+pushes to `main`:
+
+1. Install dependencies with `npm ci`.
+2. Run `npm run test:ci`.
+3. Build the frontend with `npm run build`.
+4. Validate the Worker with `npm run check`.
+5. Deploy with `npx wrangler deploy` only after the previous steps pass and the
+   commit is on `main`.
 
 Add these GitHub repository secrets before enabling production deployment:
 
@@ -145,8 +103,8 @@ Add these GitHub repository secrets before enabling production deployment:
 - `CLOUDFLARE_ACCOUNT_ID`: the Cloudflare account ID
 
 If the repository is connected to Cloudflare Workers Builds, disable its
-automatic production deployment or configure it not to promote versions. It
-must not deploy independently, otherwise it can bypass the GitHub CI gate.
+automatic production deployment. GitHub Actions is now the single production
+deployment path.
 
 ### Deployment
 
@@ -169,9 +127,9 @@ npx wrangler tail
 ```
 /
 ├── index.html          # Vite HTML entry point
-├── Dockerfile           # Multi-stage local/CI container build
+├── .env.example         # Local environment template
 ├── .github/workflows/
-│   └── ci.yml           # Docker-based GitHub validation
+│   └── ci.yml           # Native Node.js CI/CD pipeline
 ├── src/
 │   ├── client/
 │   │   ├── App.tsx     # React chat UI and streaming client
