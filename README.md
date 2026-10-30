@@ -77,27 +77,65 @@ Note: Using Workers AI accesses your Cloudflare account even during local develo
 
 ### Docker
 
-Build and run the Worker locally in a container:
+The single Dockerfile provides separate targets for local development,
+validation, and the CI deployment path. Docker Compose is not required.
+
+Build and run the development image:
 
 ```bash
-docker compose up --build
+docker build --target dev -t guesshin:dev .
+docker run --rm --name guesshin-dev -p 8787:8787 guesshin:dev
 ```
 
 Open http://localhost:8787 after the container starts. The image runs Wrangler
-in local mode as a non-root user and does not include secrets. To use the remote
-Workers AI binding from Docker, provide `CLOUDFLARE_API_TOKEN` at runtime and
-override the command with `npx wrangler dev --remote --ip 0.0.0.0`.
-
-To run the same containerized validation used by GitHub Actions:
+in local mode as a non-root user. To use the remote Workers AI binding, provide
+`CLOUDFLARE_API_TOKEN` at runtime and override the command:
 
 ```bash
-docker build --target ci .
+docker run --rm --name guesshin-dev -p 8787:8787 \
+  -e CLOUDFLARE_API_TOKEN="$CLOUDFLARE_API_TOKEN" \
+  guesshin:dev npx wrangler dev --remote --ip 0.0.0.0
 ```
+
+Build the test target locally:
+
+```bash
+docker build --target test -t guesshin:test .
+```
+
+The test target runs `npm run test:ci` and `npm run check` during the image
+build. `test:ci` is the non-interactive Vitest command and currently allows the
+repository to pass while no test files exist.
+
+Build the CI target manually for validation only:
+
+```bash
+docker build --target ci -t guesshin-ci .
+```
+
+The `ci` target inherits the test target. It is the image built by GitHub
+Actions. The `deploy` target inherits `ci`, so it cannot be built unless the
+tests and checks pass:
+
+```bash
+docker build --target deploy -t guesshin-deploy .
+docker run --rm \
+  -e CLOUDFLARE_API_TOKEN \
+  -e CLOUDFLARE_ACCOUNT_ID \
+  guesshin-deploy
+```
+
+The GitHub workflow uses this same `deploy` target and tags it with the commit
+SHA before starting it.
+
+The default image target is `runtime`, which currently behaves like the `dev`
+target. You can build it explicitly with `docker build -t guesshin:local .`.
 
 ### GitHub and Cloudflare CI/CD
 
 GitHub Actions validates pull requests and pushes to `main` by building the
-Docker `ci` target. A push to `main` deploys only after that target succeeds.
+Docker `deploy` target. Because `deploy` inherits the `ci` target, a push to
+`main` deploys only after validation succeeds.
 The deployment runs `wrangler deploy` inside the same validated Docker image,
 so CI and deployment use the same Node.js version and installed dependencies.
 
@@ -123,7 +161,7 @@ npm run deploy
 View real-time logs associated with any deployed Worker:
 
 ```bash
-npm wrangler tail
+npx wrangler tail
 ```
 
 ## Project Structure
@@ -132,7 +170,6 @@ npm wrangler tail
 /
 ├── index.html          # Vite HTML entry point
 ├── Dockerfile           # Multi-stage local/CI container build
-├── compose.yaml         # Local Worker container
 ├── .github/workflows/
 │   └── ci.yml           # Docker-based GitHub validation
 ├── src/

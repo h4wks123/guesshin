@@ -24,12 +24,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build validation target
+      - name: Build deploy target
         uses: docker/build-push-action@v6
         with:
           context: .
-          target: ci
-          tags: guesshin-ci:${{ github.sha }}
+          target: deploy
+          tags: guesshin-deploy:${{ github.sha }}
           load: true
           push: false
           cache-from: type=gha
@@ -44,5 +44,4 @@ jobs:
           docker run --rm \
             --env CLOUDFLARE_API_TOKEN \
             --env CLOUDFLARE_ACCOUNT_ID \
-            guesshin-ci:${{ github.sha }} \
-            npx wrangler deploy
+            guesshin-deploy:${{ github.sha }}

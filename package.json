@@ -44,6 +44,7 @@
     "e2e:dev": "npm run build && wrangler dev --config wrangler.e2e.jsonc",
     "start": "npm run build && wrangler dev",
     "test": "vitest",
+    "test:ci": "vitest run --passWithNoTests",
     "build": "vite build"
   }
 }
