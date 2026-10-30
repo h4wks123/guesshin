@@ -3,8 +3,9 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig(({ mode, command }) => {
 	const env = loadEnv(mode, process.cwd(), "");
+	const isVitest = process.env.VITEST === "true";
 	const server =
-		command === "serve"
+		command === "serve" && !isVitest
 			? {
 					port: requiredPort(env.PORT, "PORT"),
 					proxy: {
