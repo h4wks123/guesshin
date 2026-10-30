@@ -97,10 +97,18 @@ docker build --target ci .
 ### GitHub and Cloudflare CI/CD
 
 GitHub Actions validates pull requests and pushes to `main` by building the
-Docker `ci` target. The existing Cloudflare Workers Builds pipeline remains the
-deployment system and runs `npm run deploy`, which builds the Vite frontend
-before calling Wrangler. This avoids deploying the same commit twice from two
-different systems.
+Docker `ci` target. A push to `main` deploys only after that target succeeds.
+The deployment runs `wrangler deploy` inside the same validated Docker image,
+so CI and deployment use the same Node.js version and installed dependencies.
+
+Add these GitHub repository secrets before enabling production deployment:
+
+- `CLOUDFLARE_API_TOKEN`: a token with permission to deploy Workers
+- `CLOUDFLARE_ACCOUNT_ID`: the Cloudflare account ID
+
+If the repository is connected to Cloudflare Workers Builds, disable its
+automatic production deployment or configure it not to promote versions. It
+must not deploy independently, otherwise it can bypass the GitHub CI gate.
 
 ### Deployment
 
