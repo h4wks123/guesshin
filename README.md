@@ -49,11 +49,6 @@ This template demonstrates how to build an AI-powered chat interface using Cloud
    npm install
    ```
 
-3. Generate Worker type definitions:
-   ```bash
-   npm run cf-typegen
-   ```
-
 ### Development
 
 Create your local environment file:
@@ -80,9 +75,6 @@ a second terminal when you want to use the chat API:
 npm run dev:worker
 ```
 
-For a single server that serves the built frontend and Worker together, run
-`npm run start`.
-
 Note: Using Workers AI accesses your Cloudflare account even during local development, which will incur usage charges.
 
 ### GitHub and Cloudflare CI/CD
@@ -96,16 +88,20 @@ GitHub Actions is responsible for CI only. For pull requests and pushes to
 4. Validate the Worker with `npm run check`.
 5. Stops if any previous step fails.
 
-Cloudflare Workers Builds is responsible for deployment. Configure the
-connected Worker with:
+GitHub Actions is responsible for production deployment. The `Deploy
+Production` job requires the `Validate Worker` job to pass, and only runs for
+pushes to `main`. Configure these repository secrets:
 
-- Build command: `npm run build && npm run check`
-- Deploy command: `npm run deploy`
-- Preview command: `npx wrangler preview` if previews are enabled
+- `CLOUDFLARE_API_TOKEN`: a token with permission to deploy Workers
+- `CLOUDFLARE_ACCOUNT_ID`: the Cloudflare account ID
+
+Disable automatic production deployment in Cloudflare Workers Builds, or
+Cloudflare could deploy the same push independently of GitHub. Cloudflare
+Workers Builds may still be used for preview deployments if desired.
 
 Protect the `main` branch and require the GitHub `Validate Worker` check before
-merging. The production flow is then: pull request validation, merge to
-`main`, and Cloudflare Workers Builds deployment.
+merging. The production flow is then: pull request validation, merge to `main`,
+and the GitHub deployment job.
 
 ### Deployment
 

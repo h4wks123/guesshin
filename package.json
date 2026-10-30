@@ -36,13 +36,10 @@
   },
   "private": true,
   "scripts": {
-    "cf-typegen": "wrangler types",
     "check": "tsc --noEmit && wrangler deploy --dry-run",
     "deploy": "npm run build && wrangler deploy",
     "dev": "vite",
     "dev:worker": "npm run build && wrangler dev",
-    "e2e:dev": "npm run build && wrangler dev --config wrangler.e2e.jsonc",
-    "start": "npm run build && wrangler dev",
     "test": "vitest",
     "test:ci": "vitest run --passWithNoTests",
     "build": "vite build"
