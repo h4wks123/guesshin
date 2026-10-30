@@ -87,24 +87,25 @@ Note: Using Workers AI accesses your Cloudflare account even during local develo
 
 ### GitHub and Cloudflare CI/CD
 
-GitHub Actions runs the native Node.js/Wrangler pipeline for pull requests and
-pushes to `main`:
+GitHub Actions is responsible for CI only. For pull requests and pushes to
+`main`, it:
 
 1. Install dependencies with `npm ci`.
 2. Run `npm run test:ci`.
 3. Build the frontend with `npm run build`.
 4. Validate the Worker with `npm run check`.
-5. Deploy with `npx wrangler deploy` only after the previous steps pass and the
-   commit is on `main`.
+5. Stops if any previous step fails.
 
-Add these GitHub repository secrets before enabling production deployment:
+Cloudflare Workers Builds is responsible for deployment. Configure the
+connected Worker with:
 
-- `CLOUDFLARE_API_TOKEN`: a token with permission to deploy Workers
-- `CLOUDFLARE_ACCOUNT_ID`: the Cloudflare account ID
+- Build command: `npm run build && npm run check`
+- Deploy command: `npm run deploy`
+- Preview command: `npx wrangler preview` if previews are enabled
 
-If the repository is connected to Cloudflare Workers Builds, disable its
-automatic production deployment. GitHub Actions is now the single production
-deployment path.
+Protect the `main` branch and require the GitHub `Validate Worker` check before
+merging. The production flow is then: pull request validation, merge to
+`main`, and Cloudflare Workers Builds deployment.
 
 ### Deployment
 
