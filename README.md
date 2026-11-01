@@ -14,7 +14,7 @@ Guess which Genshin character is speaking. Each Game selects a secret character,
 
 ## Getting started
 
-Prerequisites: Node.js 18+, Wrangler CLI, and a Cloudflare account with Workers AI access.
+Prerequisites: Node.js 24, Wrangler CLI, and a Cloudflare account with Workers AI access.
 
 Install dependencies:
 
@@ -85,7 +85,10 @@ npm run deploy
 
 The GitHub Actions deployment requires `CLOUDFLARE_API_TOKEN` and
 `CLOUDFLARE_ACCOUNT_ID` repository secrets. Pull requests run tests, build, and
-the Wrangler dry-run; pushes to `main` deploy after validation.
+the Wrangler dry-run without deploying; pushes to `main` deploy after
+validation. GitHub Actions is the only normal CI/CD pipeline. Disable
+Cloudflare Workers Builds for this repository so it cannot run a duplicate
+build or deployment.
 
 ## Domain documentation
 

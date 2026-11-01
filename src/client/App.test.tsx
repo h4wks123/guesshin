@@ -14,4 +14,3 @@ describe("Guesshin rendered app boundary", () => {
     expect(markup).toContain("Ask a question or make a guess");
   });
 });
-
