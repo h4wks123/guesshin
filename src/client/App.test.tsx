@@ -25,7 +25,7 @@ describe("Guesshin rendered app boundary", () => {
     expect(markup).toContain('placeholder="Loading…"');
     expect(markup).not.toContain("The secret character is ready.");
     expect(markup).not.toContain("Mystery character");
-    expect(markup).toContain("Got it");
+    expect(markup).not.toContain("Got it");
     expect(markup).not.toContain("Press Enter to send");
   });
 

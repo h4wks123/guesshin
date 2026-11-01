@@ -1,8 +1,4 @@
-type TutorialProps = {
-  onDismiss: () => void;
-};
-
-function Tutorial({ onDismiss }: TutorialProps) {
+function Tutorial() {
   return (
     <section className="tutorial" aria-labelledby="tutorial-title">
       <div>
@@ -10,13 +6,6 @@ function Tutorial({ onDismiss }: TutorialProps) {
         <h2 id="tutorial-title">Ask the secret character questions.</h2>
         <p>When you are ready, make one Guess.</p>
       </div>
-      <button
-        className="tutorial-dismiss"
-        type="button"
-        onClick={onDismiss}
-      >
-        Got it
-      </button>
     </section>
   );
 }

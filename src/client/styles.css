@@ -154,19 +154,6 @@ h2 {
   font-size: 1rem;
   line-height: 1.35;
 }
-.tutorial-dismiss {
-  align-self: start;
-  flex-shrink: 0;
-  min-height: var(--control-height);
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--ink);
-  background: var(--surface);
-  cursor: pointer;
-  font-size: 0.875rem;
-}
-
 .game-card {
   display: flex;
   flex-direction: column;
@@ -196,7 +183,6 @@ h2 {
   cursor: pointer;
   font-weight: 750;
   transition:
-    transform 150ms ease,
     background 150ms ease,
     opacity 150ms ease;
 }
@@ -215,8 +201,7 @@ h2 {
   color: var(--ink);
   background: var(--surface-raised);
 }
-.surrender-button:hover:not(:disabled),
-.tutorial-dismiss:hover {
+.surrender-button:hover:not(:disabled) {
   border-color: var(--gold);
 }
 .send-button {
@@ -225,9 +210,6 @@ h2 {
   padding: 0 var(--space-4);
   color: #1c1720;
   background: var(--gold);
-}
-button:hover:not(:disabled) {
-  transform: translateY(-1px);
 }
 button:focus-visible,
 textarea:focus-visible {
@@ -276,7 +258,6 @@ button:disabled {
   width: min(100%, 680px);
   padding: var(--space-3) var(--space-4);
   border: 0;
-  border-bottom: 1px solid var(--border);
   border-radius: 0;
   color: var(--ink);
   line-height: 1.55;
@@ -289,7 +270,6 @@ button:disabled {
 }
 .user-message {
   align-self: end;
-  border-bottom-color: var(--border-strong);
   text-align: right;
 }
 .assistant-message {

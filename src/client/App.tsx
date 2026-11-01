@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useGameSession } from "./game/use-game-session";
 import Dialogue from "./ui/Dialogue";
 import ErrorBanner from "./ui/ErrorBanner";
@@ -12,7 +12,6 @@ import "./styles.css";
 function App() {
   const { state, newGame, sendMessage, retryMessage, surrender } =
     useGameSession();
-  const [showTutorial, setShowTutorial] = useState(true);
   const messagesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,7 +32,7 @@ function App() {
     <div className="app-shell">
       <GameHeader />
 
-      {showTutorial && <Tutorial onDismiss={() => setShowTutorial(false)} />}
+      <Tutorial />
 
       <main className="game-card">
         <GameToolbar
