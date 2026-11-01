@@ -6,12 +6,17 @@ export type GuessOutcome =
   | { kind: "incorrect"; matches: CharacterProfile[] }
   | { kind: "correct"; match: CharacterProfile };
 
-const explicitGuessPatterns = [
-  /^\s*(?:are you|is it)\b/i,
-  /^\s*(?:could|might|would)\s+(?:you\s+be|it\s+be)\b/i,
-  /^\s*(?:i\s+think|i\s+guess)\s+(?:you\s+are|you're|youre)\b/i,
-  /^\s*my\s+guess\s+is\b/i,
-  /^\s*guess\s*:/i,
+const explicitGuessPrefixes = [
+  "are you",
+  "is it",
+  "could you be",
+  "might you be",
+  "would you be",
+  "i think you are",
+  "i think youre",
+  "i guess you are",
+  "i guess youre",
+  "my guess is",
 ];
 
 export function normalizeText(value: string): string {
@@ -47,21 +52,47 @@ function matchesInRoster(
   );
 }
 
+function hasExplicitGuessIntent(
+  message: string,
+  matches: CharacterProfile[],
+): boolean {
+  const normalized = normalizeText(message);
+  if (
+    matches.some((character) =>
+      [character.name, ...character.aliases].some(
+        (alias) => normalizeText(alias) === normalized,
+      ),
+    )
+  ) {
+    return true;
+  }
+
+  if (normalized.startsWith("guess ")) return matches.length > 0;
+  const prefix = explicitGuessPrefixes.find((candidate) =>
+    normalized.startsWith(`${candidate} `),
+  );
+  if (!prefix) return false;
+
+  const remainder = normalized.slice(prefix.length).trim().replace(/^the /, "");
+  return matches.some((character) =>
+    [character.name, ...character.aliases].some((alias) => {
+      const normalizedAlias = normalizeText(alias);
+      return (
+        remainder === normalizedAlias ||
+        remainder.startsWith(`${normalizedAlias} `) ||
+        remainder.includes(` or ${normalizedAlias}`)
+      );
+    }),
+  );
+}
+
 export function evaluateGuess(
   message: string,
   secretCharacter: CharacterProfile,
   roster: readonly CharacterProfile[],
 ): GuessOutcome {
-  const normalized = normalizeText(message);
   const matches = matchesInRoster(message, roster);
-  const isExactIdentity = matches.some((character) =>
-    [character.name, ...character.aliases].some(
-      (alias) => normalizeText(alias) === normalized,
-    ),
-  );
-  const isExplicit =
-    isExactIdentity ||
-    explicitGuessPatterns.some((pattern) => pattern.test(message));
+  const isExplicit = hasExplicitGuessIntent(message, matches);
 
   if (!isExplicit || matches.length === 0) return { kind: "not-guess" };
   if (matches.length > 1) return { kind: "multiple", matches };

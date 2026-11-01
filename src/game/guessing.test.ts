@@ -25,6 +25,9 @@ describe("Guess recognition", () => {
     expect(
       evaluateGuess("Why are you asking about Diluc?", amber, CHARACTER_ROSTER),
     ).toEqual({ kind: "not-guess" });
+    expect(
+      evaluateGuess("Are you asking about Diluc?", amber, CHARACTER_ROSTER),
+    ).toEqual({ kind: "not-guess" });
   });
 
   it("keeps a direct identity question separate from Surrender", () => {
