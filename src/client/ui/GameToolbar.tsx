@@ -20,22 +20,25 @@ function GameToolbar({
   return (
     <div className="game-toolbar">
       <div className="toolbar-actions">
-        <button
-          type="button"
-          className="secondary-button"
-          onClick={onNewGame}
-          disabled={isStarting || isProcessing}
-        >
-          New game
-        </button>
-        <button
-          type="button"
-          className="surrender-button"
-          onClick={onSurrender}
-          disabled={isStarting || isProcessing || isTerminal}
-        >
-          Surrender
-        </button>
+        {isTerminal ? (
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={onNewGame}
+            disabled={isStarting || isProcessing}
+          >
+            New game
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="surrender-button"
+            onClick={onSurrender}
+            disabled={isStarting || isProcessing}
+          >
+            Surrender
+          </button>
+        )}
       </div>
     </div>
   );

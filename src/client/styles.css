@@ -195,9 +195,9 @@ h2 {
   padding: 0 var(--space-3);
 }
 .secondary-button {
-  border: 1px solid var(--border);
-  color: var(--ink);
-  background: transparent;
+  border: 1px solid var(--gold);
+  color: #1c1720;
+  background: var(--gold);
 }
 .surrender-button {
   border: 1px solid transparent;
@@ -295,9 +295,9 @@ button:disabled {
   background: var(--surface-raised);
 }
 .reveal-card h2 {
-  margin: 0.25rem 0 0.6rem;
+  margin: var(--space-1) 0 var(--space-3);
   color: var(--ink);
-  font-size: 2rem;
+  font-size: 1.6rem;
 }
 .reveal-card p:last-child {
   margin: 0;
