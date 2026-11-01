@@ -1,194 +1,94 @@
-# LLM Chat Application Template
+# Guesshin
 
-A simple, ready-to-deploy chat application template powered by Cloudflare Workers AI. This template provides a clean starting point for building AI chat applications with streaming responses.
-
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/llm-chat-app-template)
-
-<!-- dash-content-start -->
-
-## Demo
-
-This template demonstrates how to build an AI-powered chat interface using Cloudflare Workers AI with streaming responses. It features:
-
-- Real-time streaming of AI responses using Server-Sent Events (SSE)
-- Easy customization of models and system prompts
-- Support for AI Gateway integration
-- Clean, responsive React UI that works on mobile and desktop
+Guess which Genshin character is speaking. Each Game selects a secret character, lets the LLM roleplay in character, and gives the player clues to reason from.
 
 ## Features
 
-- 💬 Simple and responsive chat interface
-- ⚡ Server-Sent Events (SSE) for streaming responses
-- 🧠 Powered by Cloudflare Workers AI LLMs
-- 🛠️ Built with React, Vite, TypeScript, and Cloudflare Workers
-- 📱 Mobile-friendly design
-- 🔄 Maintains chat history on the client
-- 🔎 Built-in Observability logging
-<!-- dash-content-end -->
+- Curated playable-character roster with canonical names and Aliases
+- Server-authoritative Game state in a Cloudflare Durable Object
+- Natural-language Guesses with deterministic matching
+- In-character clues with identity-leak validation before SSE delivery
+- One-click Surrender and deterministic Reveal
+- Accessible, responsive React interface with a separate tutorial
+- Vitest coverage at the Worker HTTP boundary
 
-## Getting Started
+## Getting started
 
-### Prerequisites
+Prerequisites: Node.js 18+, Wrangler CLI, and a Cloudflare account with Workers AI access.
 
-- [Node.js](https://nodejs.org/) (v18 or newer)
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update/)
-- A Cloudflare account with Workers AI access
+Install dependencies:
 
-### Installation
+```bash
+npm install
+```
 
-1. Clone this repository:
-
-   ```bash
-   git clone https://github.com/cloudflare/templates.git
-   cd templates/llm-chat-app
-   ```
-
-2. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-### Development
-
-Create your local environment file:
+Create local environment values:
 
 ```bash
 cp .env.example .env
 ```
 
-`PORT` controls the Vite frontend port. `WORKER_PORT` controls the Vite proxy
-target; both values are required and must be aligned with the port used by
-Wrangler.
+`PORT` controls the Vite frontend port. `WORKER_PORT` controls the local Worker
+port used by the Vite `/api` proxy.
 
-Start the Vite frontend:
+Start the frontend and Worker in separate terminals:
 
 ```bash
 npm run dev
-```
-
-The frontend uses the `PORT` value from `.env`. The `/api` requests are
-proxied to the local Worker at the `WORKER_PORT` value, so start the Worker in
-a second terminal when you want to use the chat API:
-
-```bash
 npm run dev:worker
 ```
 
-Note: Using Workers AI accesses your Cloudflare account even during local development, which will incur usage charges.
+Workers AI usage during local development can incur Cloudflare usage charges.
 
-### GitHub and Cloudflare CI/CD
+## Validation
 
-GitHub Actions is responsible for CI only. For pull requests and pushes to
-`main`, it:
+```bash
+npm run test:ci
+npm run build
+npm run check
+```
 
-1. Install dependencies with `npm ci`.
-2. Run `npm run test:ci`.
-3. Build the frontend with `npm run build`.
-4. Validate the Worker with `npm run check`.
-5. Stops if any previous step fails.
+`check` runs TypeScript validation and Wrangler's deployment dry-run. The CI
+workflow runs the same validation before production deployment.
 
-GitHub Actions is responsible for production deployment. The `Deploy
-Production` job requires the `Validate Worker` job to pass, and only runs for
-pushes to `main`. Configure these repository secrets:
+## Game API
 
-- `CLOUDFLARE_API_TOKEN`: a token with permission to deploy Workers
-- `CLOUDFLARE_ACCOUNT_ID`: the Cloudflare account ID
+- `POST /api/games` creates a Game and returns an opaque `gameId`, public status, and opening message.
+- `GET /api/games/:gameId` returns the public Game snapshot.
+- `POST /api/games/:gameId/messages` accepts `{ "message": "...", "turnId": "..." }` and returns validated SSE events.
+- `POST /api/games/:gameId/surrender` ends the Game and returns the Reveal.
 
-Disable automatic production deployment in Cloudflare Workers Builds, or
-Cloudflare could deploy the same push independently of GitHub. Cloudflare
-Workers Builds may still be used for preview deployments if desired.
+The compatibility `POST /api/chat` route accepts the same `gameId` and message
+shape. The secret character is never included in an active Game snapshot.
 
-Protect the `main` branch and require the GitHub `Validate Worker` check before
-merging. The production flow is then: pull request validation, merge to `main`,
-and the GitHub deployment job.
+## Project structure
 
-### Deployment
+```text
+/
+├── src/
+│   ├── client/              # Guesshin React experience and styling
+│   ├── game/                # Roster, Guess rules, roleplay, and Game state
+│   ├── index.test.ts        # Worker-boundary behavior tests
+│   ├── index.ts             # Worker HTTP entry point
+│   └── types.ts             # Shared Game contracts
+├── docs/adr/                # Durable architecture decisions
+├── GLOSSARY.md              # Canonical domain language
+├── wrangler.jsonc           # Worker, AI, assets, and Durable Object config
+└── vite.config.ts           # Frontend and Vitest configuration
+```
 
-Deploy to Cloudflare Workers:
+## Deployment
 
 ```bash
 npm run deploy
 ```
 
-### Monitor
+The GitHub Actions deployment requires `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID` repository secrets. Pull requests run tests, build, and
+the Wrangler dry-run; pushes to `main` deploy after validation.
 
-View real-time logs associated with any deployed Worker:
+## Domain documentation
 
-```bash
-npx wrangler tail
-```
-
-## Project Structure
-
-```
-/
-├── index.html          # Vite HTML entry point
-├── .env.example         # Local environment template
-├── .github/workflows/
-│   └── ci.yml           # Native Node.js CI/CD pipeline
-├── src/
-│   ├── client/
-│   │   ├── App.tsx     # React chat UI and streaming client
-│   │   ├── main.tsx    # React entry point
-│   │   └── styles.css  # Chat UI styles
-│   ├── index.ts        # Main Worker entry point
-│   └── types.ts        # TypeScript type definitions
-├── wrangler.jsonc      # Cloudflare Worker configuration
-├── tsconfig.json       # TypeScript configuration
-└── README.md           # This documentation
-```
-
-## How It Works
-
-### Backend
-
-The backend is built with Cloudflare Workers and uses the Workers AI platform to generate responses. The main components are:
-
-1. **API Endpoint** (`/api/chat`): Accepts POST requests with chat messages and streams responses
-2. **Streaming**: Uses Server-Sent Events (SSE) for real-time streaming of AI responses
-3. **Workers AI Binding**: Connects to Cloudflare's AI service via the Workers AI binding
-
-### Frontend
-
-The frontend is a React/Vite application that:
-
-1. Presents a chat interface
-2. Sends user messages to the API
-3. Processes streaming responses in real-time
-4. Maintains chat history on the client side
-
-## Customization
-
-### Changing the Model
-
-To use a different AI model, update the `MODEL_ID` constant in `src/index.ts`. You can find available models in the [Cloudflare Workers AI documentation](https://developers.cloudflare.com/workers-ai/models/).
-
-### Using AI Gateway
-
-The template includes commented code for AI Gateway integration, which provides additional capabilities like rate limiting, caching, and analytics.
-
-To enable AI Gateway:
-
-1. [Create an AI Gateway](https://dash.cloudflare.com/?to=/:account/ai/ai-gateway) in your Cloudflare dashboard
-2. Uncomment the gateway configuration in `src/index.ts`
-3. Replace `YOUR_GATEWAY_ID` with your actual AI Gateway ID
-4. Configure other gateway options as needed:
-   - `skipCache`: Set to `true` to bypass gateway caching
-   - `cacheTtl`: Set the cache time-to-live in seconds
-
-Learn more about [AI Gateway](https://developers.cloudflare.com/ai-gateway/).
-
-### Modifying the System Prompt
-
-The default system prompt can be changed by updating the `SYSTEM_PROMPT` constant in `src/index.ts`.
-
-### Styling
-
-The UI styling is contained in `src/client/styles.css`. You can modify the CSS variables at the top to quickly change the color scheme.
-
-## Resources
-
-- [Cloudflare Workers Documentation](https://developers.cloudflare.com/workers/)
-- [Cloudflare Workers AI Documentation](https://developers.cloudflare.com/workers-ai/)
-- [Workers AI Models](https://developers.cloudflare.com/workers-ai/models/)
+Read [GLOSSARY.md](./GLOSSARY.md) for the Game vocabulary and
+[docs/adr](./docs/adr) for the server-authoritative state and validate-before-
+streaming decisions.

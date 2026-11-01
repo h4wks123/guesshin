@@ -19,7 +19,7 @@ export default {
 			const [, gameId, action] = gameMatch;
 			if (request.method === "GET" && !action) return proxyGameRequest(env, gameId, "/snapshot", request);
 			if (request.method === "POST" && action === "messages") return streamGameMessage(env, gameId, request);
-			if (request.method === "POST" && action === "surrender") return jsonGameAction(env, gameId, "/surrender", request);
+			if (request.method === "POST" && action === "surrender") return proxyGameRequest(env, gameId, "/surrender", request);
 		}
 
 		if (url.pathname === "/api/chat" && request.method === "POST") {
@@ -47,26 +47,20 @@ async function createGame(env: Env): Promise<Response> {
 }
 
 async function streamGameMessage(env: Env, pathGameId: string, request: Request): Promise<Response> {
-	const body = (await request.json()) as { gameId?: string; message?: string; messages?: Array<{ role: string; content: string }> };
+	const body = (await request.json()) as { gameId?: string; message?: string; turnId?: string; messages?: Array<{ role: string; content: string }> };
 	const gameId = pathGameId || body.gameId;
 	const message = body.message ?? body.messages?.[body.messages.length - 1]?.content;
 	if (!gameId || !message) return json({ error: "gameId and message are required" }, 400);
 
 	const result = await proxyGameRequest(env, gameId, "/message", new Request(request, {
 		method: "POST",
-		body: JSON.stringify({ message }),
+		body: JSON.stringify({ message, turnId: body.turnId }),
 		headers: { "content-type": "application/json" },
 	}));
 	if (!result.ok) return result;
 
 	const turn = (await result.json()) as GameTurnResult;
 	return sse(turn);
-}
-
-async function jsonGameAction(env: Env, gameId: string, path: string, request: Request): Promise<Response> {
-	const result = await proxyGameRequest(env, gameId, path, request);
-	if (!result.ok) return result;
-	return result;
 }
 
 async function proxyGameRequest(env: Env, gameId: string, path: string, request: Request): Promise<Response> {
@@ -79,15 +73,21 @@ async function proxyGameRequest(env: Env, gameId: string, path: string, request:
 }
 
 function sse(turn: GameTurnResult): Response {
+	const messageEvents = turn.assistant ? chunkText(turn.assistant).map((chunk) =>
+		`data: ${JSON.stringify({ type: "message", response: chunk })}\n\n`,
+	) : [];
 	const events = [
 		`data: ${JSON.stringify({ type: "state", status: turn.status, reveal: turn.reveal })}\n\n`,
-		...(turn.assistant ? [`data: ${JSON.stringify({ type: "message", response: turn.assistant })}\n\n`] : []),
+		...messageEvents,
 		"data: [DONE]\n\n",
 	];
 	return new Response(
 		new ReadableStream({
-			start(controller) {
-				for (const event of events) controller.enqueue(new TextEncoder().encode(event));
+			async start(controller) {
+				for (const event of events) {
+					controller.enqueue(new TextEncoder().encode(event));
+					await new Promise((resolve) => setTimeout(resolve, 12));
+				}
 				controller.close();
 			},
 		}),
@@ -99,6 +99,12 @@ function sse(turn: GameTurnResult): Response {
 			},
 		},
 	);
+}
+
+function chunkText(value: string, chunkSize = 48): string[] {
+	const chunks: string[] = [];
+	for (let index = 0; index < value.length; index += chunkSize) chunks.push(value.slice(index, index + chunkSize));
+	return chunks;
 }
 
 function json(value: unknown, status = 200): Response {

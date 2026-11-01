@@ -1,6 +1,6 @@
 export type GameStatus = "active" | "won" | "revealed";
 
-export type ChatMessage = {
+export type GameMessage = {
 	role: "system" | "user" | "assistant";
 	content: string;
 };
@@ -16,7 +16,19 @@ export type CharacterReveal = {
 
 export type PublicGameState = {
 	status: GameStatus;
-	messages: ChatMessage[];
+	messages: GameMessage[];
+	reveal?: CharacterReveal;
+};
+
+export type GameResponse = PublicGameState & {
+	gameId?: string;
+	assistant?: string;
+};
+
+export type GameStreamEvent = {
+	type: "state" | "message";
+	status?: GameStatus;
+	response?: string;
 	reveal?: CharacterReveal;
 };
 
