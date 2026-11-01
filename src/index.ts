@@ -1,101 +1,115 @@
-/**
- * LLM Chat Application Template
- *
- * A simple chat application using Cloudflare Workers AI.
- * This template demonstrates how to implement an LLM-powered chat interface with
- * streaming responses using Server-Sent Events (SSE).
- *
- * @license MIT
- */
-import { Env, ChatMessage } from "./types";
+import { chooseRandomCharacter } from "./game/characters";
+import { GameState, GameTurnResult } from "./game/durable-object";
+import { Env } from "./types";
 
-// Model ID for Workers AI model
-// https://developers.cloudflare.com/workers-ai/models/
-const MODEL_ID = "@cf/meta/llama-3.1-8b-instruct-fp8";
-
-// Default system prompt
-const SYSTEM_PROMPT =
-	"You are a helpful, friendly assistant. Provide concise and accurate responses.";
+export { GameState };
 
 export default {
-	/**
-	 * Main request handler for the Worker
-	 */
-	async fetch(
-		request: Request,
-		env: Env,
-	): Promise<Response> {
+	async fetch(request: Request, env: Env): Promise<Response> {
 		const url = new URL(request.url);
 
-		// Handle static assets (frontend)
-		if (url.pathname === "/" || !url.pathname.startsWith("/api/")) {
-			return env.ASSETS.fetch(request);
+		if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
+
+		if (url.pathname === "/api/games" && request.method === "POST") {
+			return createGame(env);
 		}
 
-		// API Routes
-		if (url.pathname === "/api/chat") {
-			// Handle POST requests for chat
-			if (request.method === "POST") {
-				return handleChatRequest(request, env);
-			}
-
-			// Method not allowed for other request types
-			return new Response("Method not allowed", { status: 405 });
+		const gameMatch = url.pathname.match(/^\/api\/games\/([^/]+)(?:\/(messages|surrender))?$/);
+		if (gameMatch) {
+			const [, gameId, action] = gameMatch;
+			if (request.method === "GET" && !action) return proxyGameRequest(env, gameId, "/snapshot", request);
+			if (request.method === "POST" && action === "messages") return streamGameMessage(env, gameId, request);
+			if (request.method === "POST" && action === "surrender") return proxyGameRequest(env, gameId, "/surrender", request);
 		}
 
-		// Handle 404 for unmatched routes
+		if (url.pathname === "/api/chat" && request.method === "POST") {
+			return streamGameMessage(env, "", request);
+		}
+
 		return new Response("Not found", { status: 404 });
 	},
 } satisfies ExportedHandler<Env>;
 
-/**
- * Handles chat API requests
- */
-async function handleChatRequest(
-	request: Request,
-	env: Env,
-): Promise<Response> {
+async function createGame(env: Env): Promise<Response> {
+	const id = env.GAME_STATE.newUniqueId();
+	const profile = chooseRandomCharacter();
+	const result = await env.GAME_STATE.get(id).fetch(
+		new Request("https://guesshin.game/init", {
+			method: "POST",
+			headers: { "content-type": "application/json" },
+			body: JSON.stringify({ characterId: profile.id }),
+		}),
+	);
+	if (!result.ok) return result;
+
+	const snapshot = (await result.json()) as GameTurnResult;
+	return json({ gameId: id.toString(), ...snapshot });
+}
+
+async function streamGameMessage(env: Env, pathGameId: string, request: Request): Promise<Response> {
+	const body = (await request.json()) as { gameId?: string; message?: string; turnId?: string; messages?: Array<{ role: string; content: string }> };
+	const gameId = pathGameId || body.gameId;
+	const message = body.message ?? body.messages?.[body.messages.length - 1]?.content;
+	if (!gameId || !message) return json({ error: "gameId and message are required" }, 400);
+
+	const result = await proxyGameRequest(env, gameId, "/message", new Request(request, {
+		method: "POST",
+		body: JSON.stringify({ message, turnId: body.turnId }),
+		headers: { "content-type": "application/json" },
+	}));
+	if (!result.ok) return result;
+
+	const turn = (await result.json()) as GameTurnResult;
+	return sse(turn);
+}
+
+async function proxyGameRequest(env: Env, gameId: string, path: string, request: Request): Promise<Response> {
 	try {
-		// Parse JSON request body
-		const { messages = [] } = (await request.json()) as {
-			messages: ChatMessage[];
-		};
+		const id = env.GAME_STATE.idFromString(gameId);
+		return env.GAME_STATE.get(id).fetch(new Request(`https://guesshin.game${path}`, request));
+	} catch {
+		return json({ error: "Invalid game" }, 400);
+	}
+}
 
-		// Add system prompt if not present
-		if (!messages.some((msg) => msg.role === "system")) {
-			messages.unshift({ role: "system", content: SYSTEM_PROMPT });
-		}
-
-		const inputs = {
-			messages,
-			max_tokens: 1024,
-			stream: true,
-		} satisfies AiTextGenerationInput & { stream: true };
-
-		const stream = await env.AI.run<typeof MODEL_ID>(MODEL_ID, inputs, {
-			// Uncomment to use AI Gateway
-			// gateway: {
-			//   id: "YOUR_GATEWAY_ID", // Replace with your AI Gateway ID
-			//   skipCache: false,      // Set to true to bypass cache
-			//   cacheTtl: 3600,        // Cache time-to-live in seconds
-			// },
-		});
-
-		return new Response(stream, {
+function sse(turn: GameTurnResult): Response {
+	const messageEvents = turn.assistant ? chunkText(turn.assistant).map((chunk) =>
+		`data: ${JSON.stringify({ type: "message", response: chunk })}\n\n`,
+	) : [];
+	const events = [
+		`data: ${JSON.stringify({ type: "state", status: turn.status, reveal: turn.reveal })}\n\n`,
+		...messageEvents,
+		"data: [DONE]\n\n",
+	];
+	return new Response(
+		new ReadableStream({
+			async start(controller) {
+				for (const event of events) {
+					controller.enqueue(new TextEncoder().encode(event));
+					await new Promise((resolve) => setTimeout(resolve, 12));
+				}
+				controller.close();
+			},
+		}),
+		{
 			headers: {
 				"content-type": "text/event-stream; charset=utf-8",
 				"cache-control": "no-cache",
 				connection: "keep-alive",
 			},
-		});
-	} catch (error) {
-		console.error("Error processing chat request:", error);
-		return new Response(
-			JSON.stringify({ error: "Failed to process request" }),
-			{
-				status: 500,
-				headers: { "content-type": "application/json" },
-			},
-		);
-	}
+		},
+	);
+}
+
+function chunkText(value: string, chunkSize = 48): string[] {
+	const chunks: string[] = [];
+	for (let index = 0; index < value.length; index += chunkSize) chunks.push(value.slice(index, index + chunkSize));
+	return chunks;
+}
+
+function json(value: unknown, status = 200): Response {
+	return new Response(JSON.stringify(value), {
+		status,
+		headers: { "content-type": "application/json; charset=utf-8" },
+	});
 }
