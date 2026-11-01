@@ -7,6 +7,8 @@ import type {
 import { gameClient } from "./game-client";
 import type { GameClient } from "./game-client";
 
+type ProcessingAction = "message" | "surrender";
+
 export type FailedTurn = {
   message: string;
   turnId: string;
@@ -18,6 +20,7 @@ export type GameSessionState = {
   messages: GameMessage[];
   reveal?: CharacterReveal;
   isProcessing: boolean;
+  processingAction?: ProcessingAction;
   isStarting: boolean;
   error?: string;
   failedTurn?: FailedTurn;
@@ -91,6 +94,7 @@ export function useGameSession(client: GameClient = gameClient) {
       setState((current) => ({
         ...current,
         isProcessing: true,
+        processingAction: "message",
         error: undefined,
         failedTurn: undefined,
         messages: nextHistory,
@@ -130,7 +134,11 @@ export function useGameSession(client: GameClient = gameClient) {
           error: "The character could not answer. Your game is safe—try again.",
         }));
       } finally {
-        setState((current) => ({ ...current, isProcessing: false }));
+        setState((current) => ({
+          ...current,
+          isProcessing: false,
+          processingAction: undefined,
+        }));
       }
     },
     [client, state],
@@ -149,6 +157,7 @@ export function useGameSession(client: GameClient = gameClient) {
     setState((current) => ({
       ...current,
       isProcessing: true,
+      processingAction: "surrender",
       error: undefined,
     }));
     try {
@@ -166,7 +175,11 @@ export function useGameSession(client: GameClient = gameClient) {
         error: "The character could not be revealed. Please try again.",
       }));
     } finally {
-      setState((current) => ({ ...current, isProcessing: false }));
+      setState((current) => ({
+        ...current,
+        isProcessing: false,
+        processingAction: undefined,
+      }));
     }
   }, [client, state]);
 

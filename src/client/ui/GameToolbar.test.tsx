@@ -35,4 +35,32 @@ describe("Game terminal controls", () => {
     expect(markup).toContain("New game");
     expect(markup).not.toContain("Surrender");
   });
+
+  it("announces when a new Game is starting", () => {
+    const markup = renderToStaticMarkup(
+      <GameToolbar
+        status="active"
+        isStarting
+        isProcessing={false}
+        {...actions}
+      />,
+    );
+
+    expect(markup).toContain("Starting a new Game…");
+  });
+
+  it("announces when Surrender is processing", () => {
+    const markup = renderToStaticMarkup(
+      <GameToolbar
+        status="active"
+        isStarting={false}
+        isProcessing
+        processingAction="surrender"
+        {...actions}
+      />,
+    );
+
+    expect(markup).toContain("Surrendering…");
+    expect(markup).toContain('aria-label="Surrendering…"');
+  });
 });

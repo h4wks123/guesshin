@@ -43,6 +43,7 @@ function App() {
           status={state.status}
           isStarting={state.isStarting}
           isProcessing={state.isProcessing}
+          processingAction={state.processingAction}
           onNewGame={() => void newGame()}
           onSurrender={() => void surrender()}
         />
