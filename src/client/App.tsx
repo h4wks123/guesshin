@@ -27,14 +27,11 @@ function App() {
 
   const isTerminal = state.status !== "active";
   const isComposerDisabled =
-    state.isStarting ||
-    state.isProcessing ||
-    isTerminal ||
-    !state.gameId;
+    state.isStarting || state.isProcessing || isTerminal || !state.gameId;
 
   return (
     <div className="app-shell">
-      <GameHeader status={state.status} />
+      <GameHeader />
 
       {showTutorial && <Tutorial onDismiss={() => setShowTutorial(false)} />}
 

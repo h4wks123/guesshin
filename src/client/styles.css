@@ -172,7 +172,7 @@ h2 {
   justify-content: flex-end;
   align-items: center;
   gap: var(--space-4);
-  padding: var(--space-3) var(--space-5) 0;
+  padding: var(--space-3) var(--space-5);
 }
 .toolbar-actions {
   display: flex;
