@@ -55,14 +55,17 @@ button {
 }
 
 .app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
   width: min(100% - 2rem, 780px);
   margin: 0 auto;
   padding: var(--space-6) 0 var(--space-4);
 }
 .app-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
+  display: grid;
+  flex-shrink: 0;
   gap: var(--space-2);
   padding: var(--space-2) 0 var(--space-5);
 }
@@ -81,10 +84,10 @@ p {
   margin-top: 0;
 }
 h1 {
-  margin-bottom: var(--space-1);
+  margin: 0;
   color: var(--gold);
-  font-size: clamp(2.2rem, 6vw, 4rem);
-  line-height: 0.95;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  line-height: 1.1;
   letter-spacing: -0.04em;
 }
 h2 {
@@ -126,6 +129,7 @@ h2 {
   background: var(--surface);
 }
 .tutorial {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   gap: var(--space-3);
@@ -150,24 +154,29 @@ h2 {
   font-size: 1rem;
   line-height: 1.35;
 }
-.icon-button {
+.tutorial-dismiss {
   align-self: start;
-  width: 2rem;
-  height: 2rem;
+  flex-shrink: 0;
+  min-height: var(--control-height);
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border);
-  border-radius: 50%;
-  color: var(--muted);
-  background: transparent;
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  background: var(--surface);
   cursor: pointer;
-  font-size: 1.25rem;
-  line-height: 1;
+  font-size: 0.875rem;
 }
 
 .game-card {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   border-radius: var(--radius-lg);
 }
 .game-toolbar {
+  flex-shrink: 0;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -202,9 +211,13 @@ h2 {
   background: var(--gold);
 }
 .surrender-button {
-  border: 1px solid transparent;
-  color: var(--muted);
-  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--ink);
+  background: var(--surface-raised);
+}
+.surrender-button:hover:not(:disabled),
+.tutorial-dismiss:hover {
+  border-color: var(--gold);
 }
 .send-button {
   min-width: 5rem;
@@ -227,6 +240,7 @@ button:disabled {
 }
 
 .error-banner {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -247,12 +261,16 @@ button:disabled {
 .game-messages {
   display: flex;
   flex-direction: column;
-  min-height: 420px;
-  max-height: 58vh;
+  flex: 1;
+  min-height: 0;
   gap: 0;
   overflow-y: auto;
   padding: var(--space-5);
   background: var(--surface-sunken);
+}
+.dialogue-loading {
+  display: grid;
+  place-items: center;
 }
 .message {
   width: min(100%, 680px);
@@ -311,6 +329,9 @@ button:disabled {
 }
 
 .reveal-card {
+  flex-shrink: 0;
+  max-height: 35dvh;
+  overflow-y: auto;
   margin: var(--space-4);
   padding: var(--space-5);
   border: 1px solid var(--border);
@@ -342,25 +363,17 @@ button:disabled {
 }
 
 .message-input {
-  position: relative;
+  flex-shrink: 0;
   display: flex;
   align-items: end;
   gap: var(--space-3);
-  padding: var(--space-4) var(--space-5) var(--space-2);
+  padding: var(--space-4) var(--space-5);
   border-top: 1px solid var(--border);
   background: var(--surface-sunken);
 }
-.composer-loading {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  background: rgba(15, 24, 40, 0.96);
-  pointer-events: none;
-}
 .message-input textarea {
   flex: 1;
+  min-width: 0;
   min-height: 48px;
   max-height: 160px;
   padding: var(--space-3) var(--space-3);
@@ -407,8 +420,6 @@ button:disabled {
     flex: 1;
   }
   .game-messages {
-    min-height: 400px;
-    max-height: 54vh;
     padding: var(--space-3);
   }
   .message {
@@ -416,5 +427,26 @@ button:disabled {
   }
   .message-input {
     padding-inline: var(--space-3);
+  }
+}
+
+@media (max-height: 600px) {
+  .app-shell {
+    padding-block: var(--space-2);
+  }
+  .app-header {
+    padding-block: 0 var(--space-2);
+  }
+  .app-header .eyebrow,
+  .app-header .tagline {
+    display: none;
+  }
+  .tutorial {
+    margin-bottom: var(--space-2);
+    padding-block: var(--space-2);
+  }
+  .game-toolbar,
+  .message-input {
+    padding-block: var(--space-2);
   }
 }

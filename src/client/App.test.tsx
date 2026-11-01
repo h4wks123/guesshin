@@ -9,7 +9,7 @@ describe("Guesshin rendered app boundary", () => {
 
     expect(markup).toContain("How to play");
     expect(markup).toContain("Starting a new Game…");
-    expect(markup.indexOf("Starting a new Game…")).toBeGreaterThan(
+    expect(markup.indexOf("Starting a new Game…")).toBeLessThan(
       markup.indexOf('<form class="message-input"'),
     );
     expect(markup).not.toContain("New game");
@@ -20,9 +20,12 @@ describe("Guesshin rendered app boundary", () => {
     expect(markup).not.toContain("Ask. Notice. Guess.");
     expect(markup).not.toContain("Current game");
     expect(markup).not.toContain("Made for curious travelers");
-    expect(markup).toContain('aria-live="polite"');
+    expect(markup).toContain('role="status"');
     expect(markup).toContain('aria-label="Game dialogue"');
-    expect(markup).toContain("Ask a question or make a guess");
+    expect(markup).toContain('placeholder="Loading…"');
+    expect(markup).not.toContain("The secret character is ready.");
+    expect(markup).not.toContain("Mystery character");
+    expect(markup).toContain("Got it");
     expect(markup).not.toContain("Press Enter to send");
   });
 

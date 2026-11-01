@@ -53,7 +53,8 @@ function App() {
 
         <Dialogue
           messages={state.messages}
-          isProcessing={state.isProcessing}
+          isStarting={state.isStarting}
+          isProcessing={state.processingAction === "message"}
           messagesRef={messagesRef}
         />
 

@@ -11,12 +11,11 @@ function Tutorial({ onDismiss }: TutorialProps) {
         <p>When you are ready, make one Guess.</p>
       </div>
       <button
-        className="icon-button"
+        className="tutorial-dismiss"
         type="button"
         onClick={onDismiss}
-        aria-label="Dismiss tutorial"
       >
-        ×
+        Got it
       </button>
     </section>
   );

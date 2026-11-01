@@ -4,11 +4,20 @@ import Loader from "./Loader";
 
 type DialogueProps = {
   messages: GameMessage[];
+  isStarting?: boolean;
   isProcessing: boolean;
   messagesRef: RefObject<HTMLDivElement | null>;
 };
 
-function Dialogue({ messages, isProcessing, messagesRef }: DialogueProps) {
+function Dialogue({ messages, isStarting = false, isProcessing, messagesRef }: DialogueProps) {
+  if (isStarting) {
+    return (
+      <div className="game-messages dialogue-loading" aria-label="Game dialogue">
+        <Loader label="Starting a new Game…" />
+      </div>
+    );
+  }
+
   return (
     <div
       className="game-messages"

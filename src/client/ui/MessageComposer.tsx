@@ -1,6 +1,5 @@
 import { useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
-import Loader from "./Loader";
 
 type MessageComposerProps = {
   disabled: boolean;
@@ -54,11 +53,6 @@ function MessageComposer({
         onSubmit={handleSubmit}
         aria-busy={isStarting}
       >
-        {isStarting && (
-          <div className="composer-loading">
-            <Loader label="Starting a new Game…" />
-          </div>
-        )}
         <label className="sr-only" htmlFor="message">
           Message the mystery character
         </label>
@@ -69,9 +63,11 @@ function MessageComposer({
           onChange={(event) => handleInputChange(event.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={
-            isTerminal
-              ? "This game is complete"
-              : "Ask a question or make a guess…"
+            isStarting
+              ? "Loading…"
+              : isTerminal
+                ? "This game is complete"
+                : "Ask or guess…"
           }
           rows={1}
           disabled={disabled}
