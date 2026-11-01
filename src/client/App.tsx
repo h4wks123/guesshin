@@ -67,10 +67,6 @@ function App() {
           onSend={(message) => void sendMessage(message)}
         />
       </main>
-
-      <footer>
-        <p>Made for curious travelers · No account required</p>
-      </footer>
     </div>
   );
 }

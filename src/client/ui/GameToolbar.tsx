@@ -19,16 +19,6 @@ function GameToolbar({
 
   return (
     <div className="game-toolbar">
-      <div>
-        <span className="toolbar-label">Current game</span>
-        <strong>
-          {isStarting
-            ? "Preparing a mystery…"
-            : isTerminal
-              ? "The Game is complete"
-              : "The character is listening"}
-        </strong>
-      </div>
       <div className="toolbar-actions">
         <button
           type="button"
@@ -40,11 +30,11 @@ function GameToolbar({
         </button>
         <button
           type="button"
-          className="reveal-button"
+          className="surrender-button"
           onClick={onSurrender}
           disabled={isStarting || isProcessing || isTerminal}
         >
-          Reveal character
+          Surrender
         </button>
       </div>
     </div>
