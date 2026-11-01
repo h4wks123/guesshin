@@ -36,7 +36,7 @@ describe("Game terminal controls", () => {
     expect(markup).not.toContain("Surrender");
   });
 
-  it("announces when a new Game is starting", () => {
+  it("keeps the starting state out of the toolbar", () => {
     const markup = renderToStaticMarkup(
       <GameToolbar
         status="active"
@@ -46,7 +46,7 @@ describe("Game terminal controls", () => {
       />,
     );
 
-    expect(markup).toContain("Starting a new Game…");
+    expect(markup).not.toContain("Starting a new Game…");
   });
 
   it("announces when Surrender is processing", () => {

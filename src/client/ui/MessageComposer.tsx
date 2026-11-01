@@ -1,14 +1,17 @@
 import { useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
+import Loader from "./Loader";
 
 type MessageComposerProps = {
   disabled: boolean;
+  isStarting: boolean;
   isTerminal: boolean;
   onSend: (message: string) => void;
 };
 
 function MessageComposer({
   disabled,
+  isStarting,
   isTerminal,
   onSend,
 }: MessageComposerProps) {
@@ -46,7 +49,16 @@ function MessageComposer({
 
   return (
     <>
-      <form className="message-input" onSubmit={handleSubmit}>
+      <form
+        className="message-input"
+        onSubmit={handleSubmit}
+        aria-busy={isStarting}
+      >
+        {isStarting && (
+          <div className="composer-loading">
+            <Loader label="Starting a new Game…" />
+          </div>
+        )}
         <label className="sr-only" htmlFor="message">
           Message the mystery character
         </label>
@@ -63,7 +75,6 @@ function MessageComposer({
           }
           rows={1}
           disabled={disabled}
-          aria-describedby="composer-help"
         />
         <button
           type="submit"
@@ -73,9 +84,6 @@ function MessageComposer({
           Send
         </button>
       </form>
-      <p id="composer-help" className="composer-help">
-        Press Enter to send · Shift+Enter for a new line
-      </p>
     </>
   );
 }

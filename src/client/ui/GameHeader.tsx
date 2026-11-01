@@ -17,13 +17,15 @@ function GameHeader({ status }: GameHeaderProps) {
           Someone from Teyvat is speaking. Can you discover who?
         </p>
       </div>
-      <div
-        className={`status-badge status-${status}`}
-        aria-label={`Game status: ${statusLabel}`}
-      >
-        <span aria-hidden="true" />
-        {statusLabel}
-      </div>
+      {status !== "active" && (
+        <div
+          className={`status-badge status-${status}`}
+          aria-label={`Game status: ${statusLabel}`}
+        >
+          <span aria-hidden="true" />
+          {statusLabel}
+        </div>
+      )}
     </header>
   );
 }

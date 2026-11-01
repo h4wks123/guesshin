@@ -64,6 +64,7 @@ function App() {
 
         <MessageComposer
           disabled={isComposerDisabled}
+          isStarting={state.isStarting}
           isTerminal={isTerminal}
           onSend={(message) => void sendMessage(message)}
         />
