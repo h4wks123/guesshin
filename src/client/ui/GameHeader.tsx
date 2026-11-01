@@ -5,6 +5,9 @@ type GameHeaderProps = {
 };
 
 function GameHeader({ status }: GameHeaderProps) {
+  const statusLabel =
+    status === "active" ? "Active" : status === "won" ? "Won" : "Revealed";
+
   return (
     <header className="app-header">
       <div>
@@ -16,14 +19,10 @@ function GameHeader({ status }: GameHeaderProps) {
       </div>
       <div
         className={`status-badge status-${status}`}
-        aria-label={`Game status: ${status}`}
+        aria-label={`Game status: ${statusLabel}`}
       >
         <span aria-hidden="true" />
-        {status === "active"
-          ? "Mystery active"
-          : status === "won"
-            ? "You solved it"
-            : "Mystery revealed"}
+        {statusLabel}
       </div>
     </header>
   );

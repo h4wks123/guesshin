@@ -1,5 +1,6 @@
 import type { RefObject } from "react";
 import type { GameMessage } from "../../types";
+import Loader from "./Loader";
 
 type DialogueProps = {
   messages: GameMessage[];
@@ -27,9 +28,7 @@ function Dialogue({ messages, isProcessing, messagesRef }: DialogueProps) {
         </div>
       ))}
       {isProcessing && (
-        <div className="typing-indicator" role="status">
-          The character is thinking…
-        </div>
+        <Loader label="The character is thinking…" />
       )}
     </div>
   );

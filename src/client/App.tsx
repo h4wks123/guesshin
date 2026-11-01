@@ -43,6 +43,7 @@ function App() {
           status={state.status}
           isStarting={state.isStarting}
           isProcessing={state.isProcessing}
+          processingAction={state.processingAction}
           onNewGame={() => void newGame()}
           onSurrender={() => void surrender()}
         />
@@ -67,10 +68,6 @@ function App() {
           onSend={(message) => void sendMessage(message)}
         />
       </main>
-
-      <footer>
-        <p>Made for curious travelers · No account required</p>
-      </footer>
     </div>
   );
 }
