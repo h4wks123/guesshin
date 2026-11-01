@@ -1,23 +1,27 @@
-/**
- * Type definitions for the LLM chat application.
- */
+export type GameStatus = "active" | "won" | "revealed";
 
-export interface Env {
-	/**
-	 * Binding for the Workers AI API.
-	 */
-	AI: Ai;
-
-	/**
-	 * Binding for static assets.
-	 */
-	ASSETS: { fetch: (request: Request) => Promise<Response> };
-}
-
-/**
- * Represents a chat message.
- */
-export interface ChatMessage {
+export type ChatMessage = {
 	role: "system" | "user" | "assistant";
 	content: string;
+};
+
+export type CharacterReveal = {
+	name: string;
+	element: string;
+	nation: string;
+	weapon: string;
+	role: string;
+	summary: string;
+};
+
+export type PublicGameState = {
+	status: GameStatus;
+	messages: ChatMessage[];
+	reveal?: CharacterReveal;
+};
+
+export interface Env {
+	AI: Ai;
+	ASSETS: Fetcher;
+	GAME_STATE: DurableObjectNamespace;
 }
