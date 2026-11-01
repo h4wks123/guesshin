@@ -22,40 +22,38 @@ function GameToolbar({
 }: GameToolbarProps) {
   const isTerminal = status !== "active";
 
+  if (isStarting) return null;
+
   return (
     <div className="game-toolbar">
-      {isStarting ? (
-        <Loader label="Starting a new Game…" />
-      ) : (
-        <div className="toolbar-actions">
-          {isTerminal ? (
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={onNewGame}
-              disabled={isProcessing}
-            >
-              New game
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="surrender-button"
-              onClick={onSurrender}
-              disabled={isProcessing}
-              aria-label={
-                processingAction === "surrender" ? "Surrendering…" : undefined
-              }
-            >
-              {processingAction === "surrender" ? (
-                <Loader label="Surrendering…" showLabel={false} />
-              ) : (
-                "Surrender"
-              )}
-            </button>
-          )}
-        </div>
-      )}
+      <div className="toolbar-actions">
+        {isTerminal ? (
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={onNewGame}
+            disabled={isProcessing}
+          >
+            New game
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="surrender-button"
+            onClick={onSurrender}
+            disabled={isProcessing}
+            aria-label={
+              processingAction === "surrender" ? "Surrendering…" : undefined
+            }
+          >
+            {processingAction === "surrender" ? (
+              <Loader label="Surrendering…" showLabel={false} />
+            ) : (
+              "Surrender"
+            )}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
