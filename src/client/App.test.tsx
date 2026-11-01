@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import App from "./App";
@@ -12,5 +13,15 @@ describe("Guesshin rendered app boundary", () => {
     expect(markup).toContain('aria-live="polite"');
     expect(markup).toContain('aria-label="Game dialogue"');
     expect(markup).toContain("Ask a question or make a guess");
+  });
+
+  it("publishes a recognizable browser identity", () => {
+    const document = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+
+    expect(document).toContain("<title>Guesshin · Character guessing game</title>");
+    expect(document).toContain(
+      '<link rel="icon" type="image/svg+xml" href="/favicon.svg" />',
+    );
+    expect(document).toContain('content="#101725"');
   });
 });
