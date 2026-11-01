@@ -136,13 +136,19 @@ h2 {
   color: var(--muted);
   background: transparent;
 }
-.tutorial p:last-of-type {
-  margin-bottom: 0;
+.tutorial > div {
+  display: grid;
+  gap: var(--space-2);
+}
+.tutorial .eyebrow,
+.tutorial h2,
+.tutorial p {
+  margin: 0;
 }
 .tutorial h2 {
-  margin-bottom: var(--space-1);
   color: var(--ink);
   font-size: 1rem;
+  line-height: 1.35;
 }
 .icon-button {
   align-self: start;
