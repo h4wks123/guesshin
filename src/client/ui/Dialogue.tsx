@@ -12,7 +12,7 @@ type DialogueProps = {
 function Dialogue({ messages, isStarting = false, isProcessing, messagesRef }: DialogueProps) {
   if (isStarting) {
     return (
-      <div className="game-messages dialogue-loading" aria-label="Game dialogue">
+      <div className="dialogue dialogue--loading" aria-label="Game dialogue">
         <Loader label="Starting a new Game…" />
       </div>
     );
@@ -20,20 +20,20 @@ function Dialogue({ messages, isStarting = false, isProcessing, messagesRef }: D
 
   return (
     <div
-      className="game-messages"
+      className="dialogue"
       ref={messagesRef}
       aria-live="polite"
       aria-label="Game dialogue"
     >
       {messages.map((message, index) => (
         <div
-          className={`message ${message.role}-message`}
+          className={message.role === "user" ? "message message--user" : "message"}
           key={`${index}-${message.role}`}
         >
-          <span className="message-label">
+          <span className="message__label">
             {message.role === "assistant" ? "Mystery character" : "You"}
           </span>
-          <p>{message.content}</p>
+          <p className="message__content">{message.content}</p>
         </div>
       ))}
       {isProcessing && (

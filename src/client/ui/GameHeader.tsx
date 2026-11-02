@@ -1,8 +1,8 @@
 function GameHeader() {
   return (
-    <header className="app-header">
+    <header className="game-header">
       <svg
-        className="header-crest"
+        className="game-header__crest"
         viewBox="0 0 88 88"
         fill="none"
         aria-hidden="true"
@@ -23,9 +23,9 @@ function GameHeader() {
         />
         <circle cx="44" cy="44" r="4" fill="var(--page)" />
       </svg>
-      <p className="eyebrow">A character deduction game</p>
-      <h1>Guesshin</h1>
-      <p className="tagline">
+      <p className="game-header__eyebrow">A character deduction game</p>
+      <h1 className="game-header__title">Guesshin</h1>
+      <p className="game-header__description">
         Someone from Teyvat is hiding their identity! Chat with them to figure
         out who it is. You can ask, “Are you [Character Name]?” or simply type a
         character’s name to make a guess."

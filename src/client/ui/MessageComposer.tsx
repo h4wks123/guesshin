@@ -49,14 +49,15 @@ function MessageComposer({
   return (
     <>
       <form
-        className="message-input"
+        className="composer"
         onSubmit={handleSubmit}
         aria-busy={isStarting}
       >
-        <label className="sr-only" htmlFor="message">
+        <label className="visually-hidden" htmlFor="message">
           Message the mystery character
         </label>
         <textarea
+          className="composer__input"
           id="message"
           ref={inputRef}
           value={value}
@@ -74,11 +75,16 @@ function MessageComposer({
         />
         <button
           type="submit"
-          className="send-button"
+          className="button button--primary composer__submit"
           disabled={disabled || !value.trim()}
         >
           Send
-          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <svg
+            className="composer__icon"
+            viewBox="0 0 20 20"
+            fill="none"
+            aria-hidden="true"
+          >
             <path
               d="m4 10 12-6-4 12-2-5-6-1Z"
               stroke="currentColor"

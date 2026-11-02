@@ -9,15 +9,15 @@ function RevealCard({ reveal }: RevealCardProps) {
 
   return (
     <section className="reveal-card" aria-labelledby="reveal-title">
-      <p className="eyebrow">The secret character was</p>
-      <h2 id="reveal-title">{reveal.name}</h2>
-      <div className="reveal-facts">
-        <span>{reveal.element}</span>
-        <span>{reveal.nation}</span>
-        <span>{reveal.weapon}</span>
-        <span>{reveal.role}</span>
+      <p className="reveal-card__eyebrow">The secret character was</p>
+      <h2 className="reveal-card__title" id="reveal-title">{reveal.name}</h2>
+      <div className="reveal-card__facts">
+        <span className="reveal-card__fact">{reveal.element}</span>
+        <span className="reveal-card__fact">{reveal.nation}</span>
+        <span className="reveal-card__fact">{reveal.weapon}</span>
+        <span className="reveal-card__fact">{reveal.role}</span>
       </div>
-      <p>{reveal.summary}</p>
+      <p className="reveal-card__summary">{reveal.summary}</p>
     </section>
   );
 }

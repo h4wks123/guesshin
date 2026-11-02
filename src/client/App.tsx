@@ -28,9 +28,9 @@ function App() {
     state.isStarting || state.isProcessing || isTerminal || !state.gameId;
 
   return (
-    <div className="app-shell">
+    <div className="game">
       <GameHeader />
-      <main className="game-card">
+      <main className="game__chat">
         <GameToolbar
           status={state.status}
           isStarting={state.isStarting}

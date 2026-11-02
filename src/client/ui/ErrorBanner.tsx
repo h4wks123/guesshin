@@ -11,7 +11,11 @@ function ErrorBanner({ error, canRetry, onRetry }: ErrorBannerProps) {
     <div className="error-banner" role="alert">
       <span>{error}</span>
       {canRetry && (
-        <button type="button" onClick={onRetry}>
+        <button
+          type="button"
+          className="button button--danger error-banner__retry"
+          onClick={onRetry}
+        >
           Retry
         </button>
       )}

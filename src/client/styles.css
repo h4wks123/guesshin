@@ -27,88 +27,58 @@ body {
   min-width: 320px;
   min-height: 100vh;
   isolation: isolate;
-}
 
-/* A fixed layer covers the viewport without mobile background-attachment issues. */
-body::before {
-  content: "";
-  position: fixed;
-  z-index: -2;
-  inset: 0;
-  background: var(--page) url("/genshin-bg.jpg") center / cover no-repeat;
-  pointer-events: none;
-}
+  /* Keep the artwork fixed without mobile background-attachment issues. */
+  &::before,
+  &::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+  }
 
-body::after {
-  content: "";
-  position: fixed;
-  z-index: -1;
-  inset: 0;
-  background:
-    linear-gradient(
-      90deg,
-      rgb(8 17 30 / 64%),
-      rgb(8 17 30 / 18%) 55%,
-      rgb(8 17 30 / 32%)
-    ),
-    linear-gradient(0deg, rgb(8 17 30 / 56%), transparent 45%);
-  pointer-events: none;
+  &::before {
+    z-index: -2;
+    background: var(--page) url("/genshin-bg.jpg") center / cover no-repeat;
+
+    @media (max-width: 480px) {
+      background-position: 54% center;
+    }
+  }
+
+  &::after {
+    z-index: -1;
+    background:
+      linear-gradient(
+        90deg,
+        rgb(8 17 30 / 64%),
+        rgb(8 17 30 / 18%) 55%,
+        rgb(8 17 30 / 32%)
+      ),
+      linear-gradient(0deg, rgb(8 17 30 / 56%), transparent 45%);
+  }
 }
 
 button,
 textarea {
   font: inherit;
+
+  &:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 4px;
+  }
 }
 
-button {
-  -webkit-tap-highlight-color: transparent;
-}
-
-textarea,
-.game-messages,
+.composer__input,
+.dialogue,
 .reveal-card {
   scrollbar-width: thin;
   scrollbar-color: #6d7580 transparent;
 }
 
-button:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 4px;
-}
-
-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-}
-
-.app-shell {
-  display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.65fr);
-  align-items: center;
-  gap: clamp(2rem, 6vw, 5.5rem);
-  width: min(100% - 6rem, 1180px);
-  min-height: 100vh;
-  min-height: 100svh;
-  margin-inline: auto;
-  padding-block: 3rem;
-}
-
-.app-header {
-  min-width: 0;
-  padding-bottom: 2rem;
-}
-
-.header-crest {
-  display: block;
-  width: 5.5rem;
-  height: 5.5rem;
-  margin: 0 0 2rem -0.25rem;
-  color: var(--gold);
-}
-
-.eyebrow,
-.message-label {
+.game-header__eyebrow,
+.message__label,
+.reveal-card__eyebrow {
   margin: 0;
   color: var(--gold);
   font-size: 0.65rem;
@@ -118,44 +88,45 @@ button:disabled {
   text-transform: uppercase;
 }
 
-h1,
-h2,
-p {
-  margin-top: 0;
-}
-
-h1,
-h2 {
+.game-header__title,
+.reveal-card__title {
   font-family: var(--heading-font);
   font-weight: 400;
 }
 
-h1 {
-  margin: 0.5rem 0 1.5rem;
-  color: var(--ink);
-  font-size: clamp(3rem, 5.8vw, 4.75rem);
-  line-height: 1.1;
-  letter-spacing: -0.055em;
-  text-shadow: 0 2px 24px rgb(0 0 0 / 20%);
+.game {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(20.5rem, 1fr);
+  gap: clamp(1rem, 2.5vh, 1.5rem);
+  width: min(100% - 3rem, 960px);
+  height: 100vh;
+  height: 100dvh;
+  /* Let short screens scroll when the header and a usable chat cannot fit. */
+  min-height: min-content;
+  margin-inline: auto;
+  padding-block: clamp(1rem, 3vh, 2rem);
+
+  @media (max-width: 480px) {
+    gap: 1rem;
+    width: calc(100% - 1.5rem);
+    padding-top: max(1.5rem, env(safe-area-inset-top));
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  @media (max-height: 600px) and (min-width: 601px) {
+    grid-template-rows: auto minmax(15rem, 1fr);
+    gap: 0.75rem;
+    padding-block: 0.75rem;
+  }
 }
 
-.tagline {
-  max-width: 31ch;
-  margin: 0;
-  color: #d2d9e2;
-  font-size: 0.9375rem;
-  line-height: 1.85;
-  text-wrap: pretty;
-}
-
-.game-card {
+.game__chat {
   position: relative;
   display: flex;
   flex-direction: column;
   min-width: 0;
-  height: min(760px, calc(100vh - 6rem));
-  height: min(760px, calc(100dvh - 6rem));
-  min-height: 420px;
+  min-height: 0;
   overflow: hidden;
   border: 1px solid var(--border-strong);
   border-radius: 5px;
@@ -163,29 +134,105 @@ h1 {
   box-shadow:
     0 24px 80px rgb(0 0 0 / 30%),
     0 0 0 4px rgb(17 28 44 / 30%);
+
+  /* Inset gold corners recall the game's framed menus. */
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-color: var(--gold);
+    border-style: solid;
+    pointer-events: none;
+  }
+
+  &::before {
+    inset: 5px auto auto 5px;
+    border-width: 1px 0 0 1px;
+  }
+
+  &::after {
+    inset: auto 5px 5px auto;
+    border-width: 0 1px 1px 0;
+  }
 }
 
-/* Inset gold corners recall the game's framed menus. */
-.game-card::before,
-.game-card::after {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  width: 0.75rem;
-  height: 0.75rem;
-  border-color: var(--gold);
-  border-style: solid;
-  pointer-events: none;
+.game-header {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  column-gap: 1rem;
+  align-items: center;
+  min-width: 0;
+
+  @media (max-width: 480px) {
+    padding-inline: 0.375rem;
+    column-gap: 0.875rem;
+  }
+
+  @media (max-height: 600px) and (min-width: 601px) {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    column-gap: 0.75rem;
+  }
 }
 
-.game-card::before {
-  inset: 5px auto auto 5px;
-  border-width: 1px 0 0 1px;
+.game-header__crest {
+  display: block;
+  grid-row: 1 / 3;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: 0;
+  color: var(--gold);
+
+  @media (max-height: 600px) and (min-width: 601px) {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
 }
 
-.game-card::after {
-  inset: auto 5px 5px auto;
-  border-width: 0 1px 1px 0;
+.game-header__eyebrow {
+  align-self: end;
+
+  @media (max-width: 480px) {
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+  }
+}
+
+.game-header__title {
+  margin: 0.125rem 0 0;
+  color: var(--ink);
+  font-size: clamp(2.5rem, 4vw, 3.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.055em;
+  text-shadow: 0 2px 24px rgb(0 0 0 / 20%);
+
+  @media (max-height: 600px) and (min-width: 601px) {
+    font-size: 2rem;
+  }
+}
+
+.game-header__description {
+  grid-column: 1 / -1;
+  max-width: 76ch;
+  margin: 0.875rem 0 0;
+  color: #d2d9e2;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  text-wrap: pretty;
+
+  @media (max-width: 480px) {
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.75;
+  }
+
+  @media (max-height: 600px) and (min-width: 601px) {
+    margin-top: 0.5rem;
+    font-size: 0.8125rem;
+    line-height: 1.65;
+  }
 }
 
 .game-toolbar {
@@ -198,39 +245,46 @@ h1 {
   padding: 0.875rem 1.75rem;
   border-bottom: 1px solid var(--border);
   background: rgb(255 255 255 / 2%);
+
+  @media (max-width: 480px) {
+    min-height: 4rem;
+    padding: 0.625rem 1.125rem;
+  }
+
+  @media (max-height: 600px) and (min-width: 601px) {
+    min-height: 3.5rem;
+    padding: 0.375rem 1.125rem;
+  }
 }
 
-.toolbar-ornament {
+.game-toolbar__ornament {
   display: flex;
   flex: 1;
   align-items: center;
   gap: 0.75rem;
   max-width: 10rem;
   color: var(--gold);
+
+  &::after {
+    content: "";
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border-strong), transparent);
+  }
 }
 
-.toolbar-ornament svg {
+.game-toolbar__icon {
   width: 1.5rem;
   height: 1.5rem;
   flex-shrink: 0;
 }
 
-.toolbar-ornament::after {
-  content: "";
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, var(--border-strong), transparent);
-}
-
-.toolbar-actions {
+.game-toolbar__actions {
   display: flex;
   gap: 0.5rem;
 }
 
-.secondary-button,
-.surrender-button,
-.send-button,
-.error-banner button {
+.button {
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -243,32 +297,54 @@ h1 {
   font-weight: 600;
   line-height: 1.4;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   transition:
     background-color 160ms ease,
     border-color 160ms ease,
     box-shadow 160ms ease;
-}
 
-.secondary-button,
-.send-button {
-  border-color: #e5d8b6;
-  color: #2c3440;
-  background: #e5dcc6;
-  box-shadow: inset 0 0 0 3px rgb(51 60 72 / 8%);
-}
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
 
-.surrender-button {
-  min-height: 2.75rem;
-  padding-inline: 1rem;
-  border-color: var(--border);
-  color: #d7dce3;
-  background: transparent;
-}
+  &.button--primary {
+    border-color: #e5d8b6;
+    color: #2c3440;
+    background: #e5dcc6;
+    box-shadow: inset 0 0 0 3px rgb(51 60 72 / 8%);
 
-.send-button svg {
-  width: 1.125rem;
-  height: 1.125rem;
-  flex-shrink: 0;
+    @media (hover: hover) {
+      &:hover:not(:disabled) {
+        border-color: #fff2cb;
+        background: #f2e8d1;
+        box-shadow:
+          inset 0 0 0 3px rgb(51 60 72 / 8%),
+          0 0 14px rgb(216 197 152 / 12%);
+      }
+    }
+  }
+
+  &.button--secondary {
+    min-height: 2.75rem;
+    padding-inline: 1rem;
+    border-color: var(--border);
+    color: #d7dce3;
+    background: transparent;
+
+    @media (hover: hover) {
+      &:hover:not(:disabled) {
+        border-color: var(--border-strong);
+        color: var(--ink);
+        background: rgb(216 197 152 / 7%);
+      }
+    }
+  }
+
+  &.button--danger {
+    color: #332c35;
+    background: var(--danger);
+  }
 }
 
 .error-banner {
@@ -287,15 +363,18 @@ h1 {
   background: #332c35;
   font-size: 0.875rem;
   line-height: 1.6;
+
+  @media (max-width: 480px) {
+    margin: 0.875rem 1.125rem 0;
+    padding: 0.75rem;
+  }
 }
 
-.error-banner button {
+.error-banner__retry {
   flex-shrink: 0;
-  color: #332c35;
-  background: var(--danger);
 }
 
-.game-messages {
+.dialogue {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -305,47 +384,69 @@ h1 {
   overscroll-behavior-y: contain;
   padding: 2rem 1.75rem;
   scrollbar-gutter: stable;
-}
 
-.dialogue-loading {
-  display: grid;
-  place-items: center;
+  &.dialogue--loading {
+    display: grid;
+    place-items: center;
+  }
+
+  & > .loader {
+    padding-left: 1.25rem;
+  }
+
+  @media (max-width: 480px) {
+    gap: 1.5rem;
+    padding: 1.5rem 1.125rem;
+  }
+
+  @media (max-height: 600px) and (min-width: 601px) {
+    padding: 1rem 1.125rem;
+  }
 }
 
 .message {
-  position: relative;
   flex-shrink: 0;
   width: fit-content;
   max-width: 92%;
   color: var(--ink);
   font-size: 0.9375rem;
   line-height: 1.85;
+
+  @media (max-width: 480px) {
+    max-width: 96%;
+    font-size: 0.875rem;
+    line-height: 1.75;
+  }
+
+  &.message--user {
+    align-self: end;
+    padding: 0.875rem 1.125rem;
+    border: 1px solid rgb(183 217 233 / 12%);
+    border-radius: 3px;
+    background: #233448;
+
+    & .message__label {
+      color: var(--focus);
+    }
+
+    @media (max-width: 480px) {
+      padding: 0.75rem 0.875rem;
+    }
+  }
 }
 
-.message-label {
+.message__label {
   display: block;
   margin-bottom: 0.5rem;
 }
 
-.message p {
+.message__content {
   margin: 0;
   white-space: pre-line;
   overflow-wrap: anywhere;
 }
 
-.user-message {
-  align-self: end;
-  padding: 0.875rem 1.125rem;
-  border: 1px solid rgb(183 217 233 / 12%);
-  border-radius: 3px;
-  background: #233448;
-}
-
-.user-message .message-label {
-  color: var(--focus);
-}
-
-.loading-indicator {
+.loader {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
@@ -355,21 +456,17 @@ h1 {
   line-height: 1.6;
 }
 
-.game-messages > .loading-indicator {
-  padding-left: 1.25rem;
-}
-
-.loading-spinner {
+.loader__spinner {
   width: 1rem;
   height: 1rem;
   flex: 0 0 auto;
   border: 1px solid var(--border-strong);
   border-top-color: var(--gold);
   border-radius: 50%;
-  animation: spin 900ms linear infinite;
+  animation: loader-spin 900ms linear infinite;
 }
 
-@keyframes spin {
+@keyframes loader-spin {
   to {
     transform: rotate(360deg);
   }
@@ -384,9 +481,20 @@ h1 {
   border: 1px solid var(--border-strong);
   border-radius: 3px;
   background: #233144;
+
+  @media (max-width: 480px) {
+    margin: 0 1.125rem 1rem;
+    padding: 1rem;
+  }
+
+  @media (max-height: 600px) and (min-width: 601px) {
+    max-height: 30%;
+    margin: 0 1.125rem 0.75rem;
+    padding: 1rem;
+  }
 }
 
-.reveal-card h2 {
+.reveal-card__title {
   margin: 0.375rem 0 0.875rem;
   color: var(--ink);
   font-size: 2rem;
@@ -394,28 +502,28 @@ h1 {
   overflow-wrap: anywhere;
 }
 
-.reveal-card p:last-child {
-  margin: 0;
-  color: #c8d0db;
-  font-size: 0.875rem;
-  line-height: 1.7;
-}
-
-.reveal-facts {
+.reveal-card__facts {
   display: flex;
   flex-wrap: wrap;
   gap: 0.375rem 1rem;
   margin-bottom: 0.875rem;
 }
 
-.reveal-facts span {
+.reveal-card__fact {
   color: var(--gold);
   font-size: 0.75rem;
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
 
-.message-input {
+.reveal-card__summary {
+  margin: 0;
+  color: #c8d0db;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.composer {
   display: flex;
   flex-shrink: 0;
   align-items: end;
@@ -423,9 +531,18 @@ h1 {
   padding: 1.25rem 1.75rem;
   border-top: 1px solid var(--border);
   background: rgb(9 19 32 / 40%);
+
+  @media (max-width: 480px) {
+    gap: 0.5rem;
+    padding: 1rem 1.125rem;
+  }
+
+  @media (max-height: 600px) and (min-width: 601px) {
+    padding: 0.75rem 1.125rem;
+  }
 }
 
-.message-input textarea {
+.composer__input {
   flex: 1;
   min-width: 0;
   min-height: var(--control-height);
@@ -440,22 +557,35 @@ h1 {
   font-size: 1rem;
   line-height: 1.375;
   transition: border-color 160ms ease;
+
+  &::placeholder {
+    color: #a4afbe;
+  }
+
+  &:focus {
+    border-color: var(--focus);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
 }
 
-.message-input textarea::placeholder {
-  color: #a4afbe;
+.composer__submit {
+  @media (max-width: 480px) {
+    gap: 0.375rem;
+    padding-inline: 0.75rem;
+  }
 }
 
-.message-input textarea:focus {
-  border-color: var(--focus);
+.composer__icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
 }
 
-.message-input textarea:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-.sr-only {
+.visually-hidden {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -465,198 +595,6 @@ h1 {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-
-@media (hover: hover) {
-  .secondary-button:hover:not(:disabled),
-  .send-button:hover:not(:disabled) {
-    border-color: #fff2cb;
-    background: #f2e8d1;
-    box-shadow:
-      inset 0 0 0 3px rgb(51 60 72 / 8%),
-      0 0 14px rgb(216 197 152 / 12%);
-  }
-
-  .surrender-button:hover:not(:disabled) {
-    border-color: var(--border-strong);
-    color: var(--ink);
-    background: rgb(216 197 152 / 7%);
-  }
-}
-
-@media (max-width: 900px) {
-  .app-shell {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 1.75rem;
-    width: min(100% - 3rem, 680px);
-    padding-block: 2rem;
-  }
-
-  .app-header {
-    display: grid;
-    grid-template-columns: 3.5rem minmax(0, 1fr);
-    column-gap: 1rem;
-    align-items: center;
-    padding: 0;
-  }
-
-  .header-crest {
-    grid-row: 1 / 3;
-    width: 3.5rem;
-    height: 3.5rem;
-    margin: 0;
-  }
-
-  .app-header > .eyebrow {
-    align-self: end;
-  }
-
-  h1 {
-    margin: 0.125rem 0 0;
-    font-size: 2.75rem;
-  }
-
-  .tagline {
-    grid-column: 1 / -1;
-    max-width: 62ch;
-    margin-top: 1.125rem;
-    font-size: 0.875rem;
-    line-height: 1.75;
-  }
-
-  .game-card {
-    height: calc(100vh - 16rem);
-    height: calc(100dvh - 16rem);
-    min-height: 328px;
-    max-height: 760px;
-  }
-}
-
-@media (max-width: 480px) {
-  body::before {
-    background-position: 54% center;
-  }
-
-  .app-shell {
-    gap: 1.25rem;
-    width: calc(100% - 1.5rem);
-    padding-top: max(1.5rem, env(safe-area-inset-top));
-    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
-  }
-
-  .app-header {
-    padding-inline: 0.375rem;
-    column-gap: 0.875rem;
-  }
-
-  .app-header > .eyebrow {
-    font-size: 0.625rem;
-    letter-spacing: 0.12em;
-  }
-
-  h1 {
-    font-size: 2.5rem;
-  }
-
-  .tagline {
-    margin-top: 1rem;
-  }
-
-  .game-toolbar {
-    min-height: 4rem;
-    padding: 0.625rem 1.125rem;
-  }
-
-  .game-messages {
-    gap: 1.5rem;
-    padding: 1.5rem 1.125rem;
-  }
-
-  .message {
-    max-width: 96%;
-    font-size: 0.875rem;
-    line-height: 1.75;
-  }
-
-  .user-message {
-    padding: 0.75rem 0.875rem;
-  }
-
-  .message-input {
-    gap: 0.5rem;
-    padding: 1rem 1.125rem;
-  }
-
-  .send-button {
-    gap: 0.375rem;
-    padding-inline: 0.75rem;
-  }
-
-  .error-banner {
-    margin: 0.875rem 1.125rem 0;
-    padding: 0.75rem;
-  }
-
-  .reveal-card {
-    margin: 0 1.125rem 1rem;
-    padding: 1rem;
-  }
-}
-
-@media (max-height: 600px) and (min-width: 601px) {
-  .app-shell {
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.65fr);
-    gap: 1.5rem;
-    width: min(100% - 3rem, 1180px);
-    padding-block: 1rem;
-  }
-
-  .app-header {
-    display: block;
-    padding: 0;
-  }
-
-  .game-card {
-    height: calc(100vh - 2rem);
-    height: calc(100dvh - 2rem);
-    min-height: 320px;
-  }
-
-  .header-crest {
-    width: 3.5rem;
-    height: 3.5rem;
-    margin-bottom: 1rem;
-  }
-
-  h1 {
-    margin-block: 0.375rem 0.875rem;
-    font-size: clamp(2.25rem, 5vw, 3rem);
-  }
-
-  .tagline {
-    margin: 0;
-    font-size: 0.8125rem;
-    line-height: 1.65;
-  }
-
-  .game-toolbar {
-    min-height: 3.5rem;
-    padding: 0.375rem 1.125rem;
-  }
-
-  .game-messages {
-    padding: 1rem 1.125rem;
-  }
-
-  .reveal-card {
-    max-height: 30%;
-    margin: 0 1.125rem 0.75rem;
-    padding: 1rem;
-  }
-
-  .message-input {
-    padding: 0.75rem 1.125rem;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
