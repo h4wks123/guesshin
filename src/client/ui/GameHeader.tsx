@@ -1,3 +1,5 @@
+import MusicToggle from "./MusicToggle";
+
 function GameHeader() {
   return (
     <header className="game-header">
@@ -25,6 +27,7 @@ function GameHeader() {
       </svg>
       <p className="game-header__eyebrow">A character deduction game</p>
       <h1 className="game-header__title">Guesshin</h1>
+      <MusicToggle />
       <p className="game-header__description">
         Someone from Teyvat is hiding their identity! Chat with them to figure
         out who it is. You can ask, “Are you [Character Name]?” or simply type a

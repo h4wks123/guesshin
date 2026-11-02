@@ -12,6 +12,18 @@ Guess which Genshin character is speaking. Each Game selects a secret character,
 - Accessible, responsive React interface with a separate tutorial
 - Vitest coverage at the Worker HTTP boundary
 
+## Background music
+
+The music button plays **Nin-Kiggia's Message** by HOYO-MiX from
+*Genshin Impact - The Shimmering Voyage Vol. 6*.
+[Official recording](https://www.youtube.com/watch?v=ob-PHMtrSRk).
+The audio is stored in `public/nin-kiggia-message.m4a` in its source AAC format.
+It comes from the [Genshin Impact OST Library](https://music.kuutar.moe/soundtrack/nin-kiggia-s-message).
+
+The player tries to start music with sound when the page opens. If the browser
+blocks autoplay, playback starts on the first click, tap, or key press.
+The music button lets the user pause or resume playback.
+
 ## Getting started
 
 Prerequisites: Node.js 24, Wrangler CLI, and a Cloudflare account with Workers AI access.
