@@ -6,7 +6,6 @@ import GameHeader from "./ui/GameHeader";
 import GameToolbar from "./ui/GameToolbar";
 import MessageComposer from "./ui/MessageComposer";
 import RevealCard from "./ui/RevealCard";
-import Tutorial from "./ui/Tutorial";
 import "./styles.css";
 
 function App() {
@@ -31,9 +30,6 @@ function App() {
   return (
     <div className="app-shell">
       <GameHeader />
-
-      <Tutorial />
-
       <main className="game-card">
         <GameToolbar
           status={state.status}
