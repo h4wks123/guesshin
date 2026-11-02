@@ -26,6 +26,12 @@ function GameToolbar({
 
   return (
     <div className="game-toolbar">
+      <div className="toolbar-ornament" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="m12 1 3 8 8 3-8 3-3 8-3-8-8-3 8-3Z" stroke="currentColor" />
+          <path d="m12 7 2 5-2 5-2-5Z" fill="currentColor" />
+        </svg>
+      </div>
       <div className="toolbar-actions">
         {isTerminal ? (
           <button
