@@ -79,7 +79,12 @@ function MessageComposer({
         >
           Send
           <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="m4 10 12-6-4 12-2-5-6-1Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
+            <path
+              d="m4 10 12-6-4 12-2-5-6-1Z"
+              stroke="currentColor"
+              strokeWidth="1.3"
+              strokeLinejoin="round"
+            />
             <path d="m10 11 6-7" stroke="currentColor" strokeWidth="1.3" />
           </svg>
         </button>
