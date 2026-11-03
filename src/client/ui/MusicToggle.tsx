@@ -96,7 +96,7 @@ function MusicToggle() {
       <button
         ref={buttonRef}
         type="button"
-        className={`button music-toggle${isPlaying ? " music-toggle--playing" : ""}`}
+        className={`button button--icon music-toggle${isPlaying ? " music-toggle--playing" : ""}`}
         aria-label="Background music"
         aria-pressed={isPlaying}
         title={
@@ -105,7 +105,7 @@ function MusicToggle() {
         onClick={toggleMusic}
       >
         <svg
-          className="music-toggle__icon"
+          className="button__icon"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"

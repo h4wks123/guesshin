@@ -39,22 +39,18 @@ function App() {
           onNewGame={() => void newGame()}
           onSurrender={() => void surrender()}
         />
-
         <ErrorBanner
           error={state.error}
           canRetry={Boolean(state.failedTurn)}
           onRetry={retryMessage}
         />
-
         <Dialogue
           messages={state.messages}
           isStarting={state.isStarting}
           isProcessing={state.processingAction === "message"}
           messagesRef={messagesRef}
         />
-
         <RevealCard reveal={state.reveal} />
-
         <MessageComposer
           disabled={isComposerDisabled}
           isStarting={state.isStarting}

@@ -27,7 +27,30 @@ function GameHeader() {
       </svg>
       <p className="game-header__eyebrow">A character deduction game</p>
       <h1 className="game-header__title">Guesshin</h1>
-      <MusicToggle />
+      <div className="game-header__actions">
+        <a
+          className="button button--icon"
+          href="https://hawks-portfolio.site/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit my portfolio (opens in a new tab)"
+          title="Visit my portfolio (opens in a new tab)"
+        >
+          <svg
+            className="button__icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m10 13 4-4m-6 2-3 3a4.24 4.24 0 0 0 6 6l3-3m-4-10 3-3a4.24 4.24 0 0 1 6 6l-3 3" />
+          </svg>
+        </a>
+        <MusicToggle />
+      </div>
       <p className="game-header__description">
         Someone from Teyvat is hiding their identity! Chat with them to figure
         out who it is. You can ask, “Are you [Character Name]?” or simply type a
