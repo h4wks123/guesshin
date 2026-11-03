@@ -136,7 +136,6 @@ textarea {
     0 24px 80px rgb(0 0 0 / 30%),
     0 0 0 4px rgb(17 28 44 / 30%);
 
-  /* Inset gold corners recall the game's framed menus. */
   &::before,
   &::after {
     content: "";
@@ -587,19 +586,11 @@ textarea {
 .game-header__actions {
   position: fixed;
   z-index: 2;
-  right: max(1.5rem, env(safe-area-inset-right));
-  bottom: max(1rem, env(safe-area-inset-bottom));
+  top: 32px;
+  left: calc(100% - 7.5rem);
   display: flex;
   align-items: center;
   gap: 0.5rem;
-
-  @media (max-width: 1240px) {
-    grid-column: 1 / -1;
-    grid-row: 3;
-    align-items: normal;
-    top: 32px;
-    left: calc(100% - 7.5rem);
-  }
 }
 
 .button--icon {

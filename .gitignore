@@ -1,9 +1,4 @@
-# Created by https://www.toptal.com/developers/gitignore/api/macos,node,git
-# Edit at https://www.toptal.com/developers/gitignore?templates=macos,node,git
-
 ### Git ###
-# Created by git for backups. To disable backups in Git:
-# $ git config --global mergetool.keepBackup false
 *.orig
 
 # Created by git when using merge tools for conflicts
@@ -17,7 +12,6 @@
 *_REMOTE_*.txt
 
 ### macOS ###
-# General
 .DS_Store
 .AppleDouble
 .LSOverride
@@ -45,12 +39,9 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-### macOS Patch ###
-# iCloud generated files
 *.icloud
 
 ### Node ###
-# Logs
 logs
 *.log
 npm-debug.log*
@@ -81,7 +72,6 @@ coverage
 # Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
 .grunt
 
-# Bower dependency directory (https://bower.io/)
 bower_components
 
 # node-waf configuration
@@ -90,23 +80,18 @@ bower_components
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
-# Dependency directories
 node_modules/
 jspm_packages/
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
-# TypeScript cache
 *.tsbuildinfo
 
-# Optional npm cache directory
 .npm
 
-# Optional eslint cache
 .eslintcache
 
-# Optional stylelint cache
 .stylelintcache
 
 # Microbundle cache
@@ -124,7 +109,6 @@ web_modules/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variable files
 .env
 .env.development.local
 .env.test.local
@@ -145,11 +129,7 @@ dist
 
 # Gatsby files
 .cache/
-# Comment in the public line in if your project uses Gatsby and not Next.js
-# https://nextjs.org/blog/next-9-1#public-directory-support
-# public
 
-# vuepress build output
 .vuepress/dist
 
 # vuepress v2.x temp and cache directory
@@ -158,16 +138,13 @@ dist
 # Docusaurus cache and generated files
 .docusaurus
 
-# Serverless directories
 .serverless/
 
 # FuseBox cache
 .fusebox/
 
-# DynamoDB Local files
 .dynamodb/
 
-# TernJS port file
 .tern-port
 
 # Stores VSCode versions used for testing VSCode extensions
@@ -180,16 +157,10 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-### Node Patch ###
-# Serverless Webpack directories
 .webpack/
-
-# Optional stylelint cache
 
 # SvelteKit build / generate output
 .svelte-kit
-
-# End of https://www.toptal.com/developers/gitignore/api/macos,node,git
 
 ### Wrangler ###
 .wrangler/
