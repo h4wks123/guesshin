@@ -2,7 +2,7 @@ import { GameMessage } from "../types";
 import { CharacterProfile } from "./characters";
 import { normalizeText } from "./guessing";
 
-export const MODEL_ID = "@cf/meta/llama-3.1-8b-instruct-fp8";
+export const MODEL_ID = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 
 export type AiRunner = {
   run: (model: string, inputs: unknown, options?: unknown) => Promise<unknown>;
